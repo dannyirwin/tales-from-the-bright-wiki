@@ -21,7 +21,8 @@
     "install-plugins": "npx tsx ./quartz/plugins/loader/install-plugins.ts",
     "prebuild": "npm run install-plugins",
     "sync": "node scripts/sync-vault.mjs",
-    "preview": "node scripts/sync-vault.mjs && npx quartz build --serve"
+    "preview": "node scripts/sync-vault.mjs && npx quartz build --serve",
+    "bump": "node scripts/bump-site-meta.mjs"
   },
   "engines": {
     "npm": ">=10.9.2",
