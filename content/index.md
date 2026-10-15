@@ -1,14 +1,10 @@
 ---
 title: Tales From the Bright
+publish: true
 ---
 
 # Tales From the Bright
 
 Campaign wiki for **Into the Arecene**.
 
-## Explore
-
-- [[The Gods in the Light]]
-- [[The Gods of the Void]]
-- [[War of the Gods]]
-- [[Act 1 - Into the Arecene]]
+Notes appear here only when marked with `publish: true` in Obsidian.
