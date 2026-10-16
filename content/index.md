@@ -1,5 +1,5 @@
 ---
-title: Tales From the Bright
+title: "Home: Tales from the Bright"
 publish: true
 ---
 
