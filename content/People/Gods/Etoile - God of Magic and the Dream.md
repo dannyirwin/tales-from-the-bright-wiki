@@ -5,8 +5,12 @@ aliases:
   - God of the Dream
 tags:
   - God
+faction: Void
+publish: false
 ---
-## Domains
+
+## Domain
+
 - Magic
 - Dreams
 - Wonder

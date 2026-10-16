@@ -14,6 +14,7 @@ configuration:
     - .obsidian
     - Excalidraw
     - "**/__TEMPLATE.md"
+    - "**/*.base"
   theme:
     fontOrigin: googleFonts
     cdnCaching: true
@@ -189,7 +190,7 @@ plugins:
       position: beforeBody
       priority: 10
   - source: "@quartz-community/content-meta"
-    enabled: true
+    enabled: false
     layout:
       position: beforeBody
       priority: 20
@@ -199,7 +200,7 @@ plugins:
       position: beforeBody
       priority: 30
   - source: "@quartz-community/page-title"
-    enabled: true
+    enabled: false
     layout:
       position: left
       priority: 10
@@ -259,8 +260,10 @@ plugins:
         - description
         - tags
         - aliases
+        - faction
       excludedProperties: []
       hidePropertiesView: false
+      collapsed: true
       delimiters: ---
       language: yaml
     order: 5

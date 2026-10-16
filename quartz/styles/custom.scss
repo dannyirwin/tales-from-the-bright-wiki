@@ -1,3 +1,9 @@
 @use "./variables.scss" as *;
 
-// put your custom CSS here!
+// Match content page headers to the sidebar brand title style
+.page-header .article-title {
+  margin: 0.5rem 0 0;
+  font-size: 1.75rem;
+  font-family: var(--titleFont);
+  font-weight: 700;
+}

@@ -6,8 +6,11 @@ aliases:
   - God of Song
 tags:
   - God
+faction: Void
+publish: false
 ---
 
 ## Domain
-- All Arts and Creative Endeavors
+
+- All arts and creative endeavors
 - Stories

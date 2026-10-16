@@ -59,7 +59,8 @@ function ensureIndexPublish() {
     return
   }
   const text = fs.readFileSync(indexPath, "utf8")
-  if (/^publish:\s*true\s*$/m.test(text)) return
+  // Obsidian Properties may save publish: "true" (quoted)
+  if (/^publish:\s*"?true"?\s*$/m.test(text)) return
   if (text.startsWith("---")) {
     fs.writeFileSync(indexPath, text.replace(/^---\n/, "---\npublish: true\n"))
   } else {
