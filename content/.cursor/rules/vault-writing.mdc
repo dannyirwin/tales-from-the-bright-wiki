@@ -1,0 +1,41 @@
+---
+description: Writing and linking conventions for Tales From the Bright vault notes
+globs: "**/*.md"
+alwaysApply: false
+---
+
+# Vault writing
+
+## Wikilinks
+
+- Link a concept **once per page**, on the first useful mention.
+- Later repeats stay plain text (same page, same note target).
+- Do not link every occurrence of Lumenhold, Stonewake, Blackstone, etc. in a paragraph.
+- If two display words point at the same note in one sentence (e.g. Blackstone and Illumination), link only one.
+- **Exceptions**: intentional nav/rosters (Quick links, hubs, Bases). Those may list many links.
+
+```markdown
+<!-- good -->
+Journey to [[Lumenhold]] for [[Stonewake Festival]]. Have you been to Lumenhold before?
+
+<!-- bad -->
+Journey to [[Lumenhold]] for [[Stonewake Festival]]. Have you been to [[Lumenhold]] or the [[Stonewake Festival|Festival]] before?
+```
+
+## Prose
+
+- Prefer short, concrete sentences. No em dashes.
+- Avoid purple / AI-sounding filler. Keep lore notes basic unless expanding on purpose.
+- Placeholders stay obvious (`[[IDK YET WORLD]]`, `[[NAME OF …]]`).
+
+## Frontmatter
+
+- Allowed keys: `aliases`, `tags`, `publish`, `faction` (gods only), `title` (home only).
+- Tags: singular Title Case kinds — see `.cursor/skills/vault-tags/taxonomy.md`.
+- `publish: true` for player-facing lore; `false` for Void gods and private PC material.
+- Do not put Light/Void/Neutral in tags when `faction:` is set.
+
+## Structure
+
+- One idea per note when it will grow; combine only when terms are the same system (e.g. Illumination + Blackstone).
+- Folders: `Locations/`, `Events/`, `Lore/`, `People/Gods/`, `Factions/`, `People/PCs/`.
