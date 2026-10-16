@@ -1,11 +1,15 @@
 ---
 aliases:
   - Holy Mountain
+  - Arecene
+  - the Arecene
 tags:
   - Place
 publish: true
 ---
 
-Holy mountain of [[Arecene]]. The city-state [[Lumenhold]] sprawls from the crater of the volcano. 
+Holy mountain. [[Lumenhold]] sprawls from the crater of the mountaintop. Main source of [[Divine Illumination|Blackstone]] in the world.
 
-Every decade, on the longest night, the [[Gods]] descend here for [[Stonewake Festival|Stonewake]]. The [[Arecenia - The Bright Mother|Bright Mother]] invests the mountain's [[Divine Illumination|Blackstone]]. That stone is mined and sent out as fortification, blessing, and road-gravel, then hauled back spent to be renewed at the next Stonewake.
+## Arecene
+
+The holy region around the mountain in the far north, named for the [[Arecenia - The Bright Mother|Bright Mother]]. Pilgrims come through here for [[Stonewake Festival|Stonewake]].

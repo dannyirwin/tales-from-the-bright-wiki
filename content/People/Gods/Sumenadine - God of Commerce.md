@@ -6,7 +6,7 @@ aliases:
 tags:
   - God
 faction: Light
-publish: true
+publish: false
 ---
 
 God of commerce, war, competition, and victory. Fortitude and unity; pride; the Long Winter. The Great Protector.

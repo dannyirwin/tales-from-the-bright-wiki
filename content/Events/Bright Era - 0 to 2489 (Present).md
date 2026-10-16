@@ -12,7 +12,7 @@ An era of largely peaceful coexistence between the people of the world, underpin
 
 ## The gods now
 
-The [[Gods]] no longer walk amongst the mortals in the [[Mundane Plane|mundane realm]]. By order of the [[Arecenia - The Bright Mother|Bright Mother]],  the [[Decennial Pact]] allows that  they only pour power into the world on their once a decade cycle (at the [[Stonewake Festival]]) and spend the next decade replenishing. Blessings around the world are restored, along with [[Divine Illumination|Blackstone]], and the cycle repeats. 
+The [[Gods]] no longer walk amongst the mortals in the [[Mundane Plane|mundane realm]]. By order of the [[Arecenia - The Bright Mother|Bright Mother]],  the [[Divine Calamity - The War of the Gods|Decennial Pact]] allows that  they only pour power into the world on their once a decade cycle (at the [[Stonewake Festival]]) and spend the next decade replenishing. Blessings around the world are restored, along with [[Divine Illumination|Blackstone]], and the cycle repeats. 
 
 ## The decade cycle
 

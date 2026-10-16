@@ -19,7 +19,10 @@ This is a living repo, as we write the world I'll add to it
 - Any classes are fine and most* official heritage/race without a fly speed is good.
 - Point buy stats
 
-See the [[World Overview]] first
+
+
+
+See the [[World Overview]]
 
 Backstory considerations, no need to answer all/any of these but just to get ideas going:
 - You will begin as a part of a caravan on its journey to [[Lumenhold]] for the great [[Stonewake Festival]], what brings you on this pilgrimage?
@@ -30,10 +33,11 @@ Backstory considerations, no need to answer all/any of these but just to get ide
 - What is your relationship with the gods? Do you follow any?
 - What responsibilities are you either fulfilling on this trip, or potentially leaving behind?
 
+
 ## Quick links
 
-- [[Arecene]] · [[Mount Steradian]] · [[Lumenhold]]
+- [[Mount Steradian]] · [[Lumenhold]]
 - [[Stonewake Festival]]
 - [[Divine Calamity - The War of the Gods]]
 - [[Gods]] · [[The Void]]
-- [[Divine Artifacts]] · [[Divine Illumination]] · [[Champions]] · [[The Wilds]]
+- [[Divine Artifacts]] · [[Divine Illumination]] · [[Champions]] · [[Wilds]]

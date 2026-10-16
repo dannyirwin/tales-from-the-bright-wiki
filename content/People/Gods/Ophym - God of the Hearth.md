@@ -5,7 +5,7 @@ aliases:
 tags:
   - God
 faction: Light
-publish: true
+publish: false
 ---
 
 God of community, harvest, and family. The Shepherd and Provider. The Rising Tide; Mercy.

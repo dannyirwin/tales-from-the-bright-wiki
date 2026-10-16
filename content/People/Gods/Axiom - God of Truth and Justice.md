@@ -6,7 +6,7 @@ aliases:
 tags:
   - God
 faction: Light
-publish: true
+publish: false
 ---
 
 God of Truth and Justice.

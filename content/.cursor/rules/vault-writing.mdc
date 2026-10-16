@@ -1,41 +1,54 @@
 ---
-description: Writing and linking conventions for Tales From the Bright vault notes
+description: Writing, linking, tags, aliases, and frontmatter conventions for vault notes
 globs: "**/*.md"
 alwaysApply: false
 ---
 
 # Vault writing
 
+Full tag audit workflow: `.cursor/skills/vault-tags/` (see `taxonomy.md`).
+
 ## Wikilinks
 
-- Link a concept **once per page**, on the first useful mention.
-- Later repeats stay plain text (same page, same note target).
-- Do not link every occurrence of Lumenhold, Stonewake, Blackstone, etc. in a paragraph.
-- If two display words point at the same note in one sentence (e.g. Blackstone and Illumination), link only one.
-- **Exceptions**: intentional nav/rosters (Quick links, hubs, Bases). Those may list many links.
+- Link a concept **once per page**, on the first useful mention; later repeats stay plain text.
+- If two display words share one note (Blackstone / Illumination), link only one in that sentence.
+- **Exceptions**: Quick links, hubs, Bases — intentional link lists are fine.
 
-```markdown
-<!-- good -->
-Journey to [[Lumenhold]] for [[Stonewake Festival]]. Have you been to Lumenhold before?
+## Aliases
 
-<!-- bad -->
-Journey to [[Lumenhold]] for [[Stonewake Festival]]. Have you been to [[Lumenhold]] or the [[Stonewake Festival|Festival]] before?
-```
+- Use `aliases` for search names and short forms people will type or link (`Stonewake`, `Bright Mother`, `the Mundane`).
+- Prefer aliases over duplicate notes for alternate titles.
+- Verb/forms that resolve to the same concept go on that note (`Illuminates`, `Illuminated` on Divine Illumination).
+- Do not put aliases that belong on another note; do not use aliases as a second tagging system.
+
+## Properties
+
+Only these frontmatter keys:
+
+| Key | Where | Notes |
+|-----|--------|--------|
+| `aliases` | any | YAML list |
+| `tags` | any | kind tags only (below) |
+| `publish` | any | unquoted `true` / `false` |
+| `faction` | gods only | `Light` \| `Void` \| `Neutral` — **not** a tag |
+| `title` | wiki home only | optional |
+
+- Remove typos and unused keys. Never invent new properties without updating `taxonomy.md`.
+- Bases filter gods with `faction:` + `God` tag — do not also tag Light/Void/Neutral.
+
+## Tags
+
+- Singular **Title Case**: `Place`, `Event`, `Concept`, `God`, `Faction`, `NPC`, `Player`, `Setting` (+ optional `Session`).
+- One primary kind per note (folder default: Locations→Place, Events→Event, Lore→Concept / World Overview→Setting, Gods→God, Factions→Faction, PCs→Player).
+- YAML list, one `- Tag` per line, sorted alphabetically. No plurals, no lowercase kinds (`place`), no subtypes like `city-state` unless we add them to taxonomy on purpose.
+- `publish: true` for player-facing lore; `false` for Void gods, private PCs, DM-only stubs.
 
 ## Prose
 
-- Prefer short, concrete sentences. No em dashes.
-- Avoid purple / AI-sounding filler. Keep lore notes basic unless expanding on purpose.
-- Placeholders stay obvious (`[[IDK YET WORLD]]`, `[[NAME OF …]]`).
-
-## Frontmatter
-
-- Allowed keys: `aliases`, `tags`, `publish`, `faction` (gods only), `title` (home only).
-- Tags: singular Title Case kinds — see `.cursor/skills/vault-tags/taxonomy.md`.
-- `publish: true` for player-facing lore; `false` for Void gods and private PC material.
-- Do not put Light/Void/Neutral in tags when `faction:` is set.
+- Short and concrete. No em dashes. Avoid AI filler.
+- Placeholders stay obvious (`[[IDK YET WORLD]]`).
 
 ## Structure
 
-- One idea per note when it will grow; combine only when terms are the same system (e.g. Illumination + Blackstone).
+- Combine notes only when terms are one system (Illumination + Blackstone). Otherwise one idea per note.
 - Folders: `Locations/`, `Events/`, `Lore/`, `People/Gods/`, `Factions/`, `People/PCs/`.

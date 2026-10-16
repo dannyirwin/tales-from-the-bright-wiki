@@ -1,7 +1,7 @@
 ---
 tags:
   - Event
-publish: true
+publish: false
 aliases:
   - Heroic Age
 ---

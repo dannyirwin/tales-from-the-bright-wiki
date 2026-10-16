@@ -6,7 +6,7 @@ aliases:
   - material world
 tags:
   - Concept
-publish: true
+publish: false
 ---
 
 The mortal world. Where people live. Gods of the modern age mostly stay out of it, save [[Stonewake Festival|Stonewake]].

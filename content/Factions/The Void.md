@@ -3,7 +3,7 @@ aliases:
   - Void
 tags:
   - Faction
-publish: true
+publish: false
 ---
 
 The Void were the fallen pantheon in [[Divine Calamity - The War of the Gods]]. Their defeat ushered in the modern age.
