@@ -22,7 +22,8 @@
     "prebuild": "npm run install-plugins",
     "sync": "node scripts/sync-vault.mjs",
     "preview": "node scripts/sync-vault.mjs && npx quartz build --serve",
-    "bump": "node scripts/bump-site-meta.mjs"
+    "bump": "node scripts/bump-site-meta.mjs",
+    "publish": "node scripts/publish.mjs"
   },
   "engines": {
     "npm": ">=10.9.2",
