@@ -71,7 +71,17 @@ export function pageResources(
     }
   })
 
-  const contentIndexPath = joinSegments(baseDir, "static/contentIndex.json")
+  // Search + explorer both load this index. Use a site-root absolute path when
+  // deployed under a subpath (e.g. GitHub Pages /tales-from-the-bright-wiki),
+  // because relative ./static/... breaks depending on the current page URL.
+  // Local --serve keeps relative paths (dev server has no baseUrl prefix).
+  const siteBasePath =
+    ctx && !ctx.argv.serve && ctx.cfg.configuration.baseUrl
+      ? new URL(`https://${ctx.cfg.configuration.baseUrl}`).pathname.replace(/\/$/, "")
+      : ""
+  const contentIndexPath = siteBasePath
+    ? `${siteBasePath}/static/contentIndex.json`
+    : joinSegments(baseDir, "static/contentIndex.json")
   const contentIndexScript = `const fetchData = fetch("${contentIndexPath}").then(data => data.json())`
 
   const resources: StaticResources = {
