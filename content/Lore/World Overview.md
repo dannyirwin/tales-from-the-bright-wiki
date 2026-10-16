@@ -19,6 +19,7 @@ The city-state nations very significantly place to place (read: Room for collabo
 
 Simple holy magic is very commonplace, cantrips and low level spell casting as well as very slow acting ritual or blessing magic is achievable with Blackstone or standard holy stuff. Outside that, you certainly can have a character that uses other forms of magic (any class is valid) but they will be somewhat unusual in settlements that largely rely on the divine. We'll flavor it however we need to. Otherwise settlements will all have their own relationships and beliefs about magic. In the wilds magic is common and unpredictable. 
 
+If you pick a class that relies on a god or patrion, that part of the lore is going to be a little more on rails for you, and we will have to homebrew flavor. If you're into that talk to me
 ## Common historical knowledge
 
 The Divine Calamity ended 2489 years ago. The [[Gods]] fought the [[The Void]] over the fate of the world. The old gods used the mortal plane to enact their every whim, which naturally escalated to nations toppling and unparalled disaster. [[Arecenia - The Bright Mother]] joined 4 of her children in defeating the Void. As both penance and a form of protection, the Bright Mother forbade all gods from interfering in the world at all, save for their once-a-decade procession when descend to expend their divinity one long night every decade.
