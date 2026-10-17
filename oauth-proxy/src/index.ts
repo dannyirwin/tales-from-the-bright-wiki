@@ -454,7 +454,7 @@ export default {
         pageTitle || page ? `**Page:** ${pageTitle || page}` : null,
         page ? `**Slug:** \`${page}\`` : null,
         pageUrl ? `**URL:** ${pageUrl}` : null,
-        quote ? `\n> ${quote.replace(/\n/g, "\n> ")}\n` : null,
+        quote ? `\n**Quoted markdown:**\n\n\`\`\`md\n${quote}\n\`\`\`\n` : null,
         body,
       ]
         .filter(Boolean)
