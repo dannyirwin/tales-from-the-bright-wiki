@@ -114,9 +114,19 @@ export default (() => {
     padding: 0.35rem 0.65rem;
     margin: 0.35rem 0 0.5rem;
     white-space: pre-wrap;
-    font-size: 0.9rem;
+    font-size: 0.82rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     max-height: 8rem;
     overflow: auto;
+    background: var(--lightgray);
+    background: color-mix(in srgb, var(--lightgray) 35%, transparent);
+    border-radius: 0 0.25rem 0.25rem 0;
+  }
+  .tftb-suggest-modal textarea.tftb-md {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    min-height: 8rem;
   }
   .tftb-suggest-actions {
     display: flex;
@@ -197,23 +207,68 @@ export default (() => {
     floatBtn = null;
   }
 
-  function showFloat(rect, quote) {
+  var turndownLoading = null;
+  function ensureTurndown() {
+    if (window.TurndownService) return Promise.resolve();
+    if (turndownLoading) return turndownLoading;
+    turndownLoading = new Promise(function (resolve, reject) {
+      var s = document.createElement("script");
+      s.src = "https://cdn.jsdelivr.net/npm/turndown@7.2.0/dist/turndown.js";
+      s.async = true;
+      s.onload = function () { resolve(); };
+      s.onerror = function () { turndownLoading = null; reject(new Error("turndown")); };
+      document.head.appendChild(s);
+    });
+    return turndownLoading;
+  }
+
+  function selectionToMarkdown() {
+    var sel = window.getSelection && window.getSelection();
+    if (!sel || sel.isCollapsed || !sel.rangeCount) return "";
+    var plain = (sel.toString() || "").trim();
+    if (!window.TurndownService) return plain.slice(0, 8000);
+    try {
+      var range = sel.getRangeAt(0);
+      var div = document.createElement("div");
+      div.appendChild(range.cloneContents());
+      var td = new window.TurndownService({
+        headingStyle: "atx",
+        codeBlockStyle: "fenced",
+        bulletListMarker: "-",
+      });
+      td.addRule("quartzInternal", {
+        filter: function (node) {
+          return node.nodeName === "A" && node.classList && node.classList.contains("internal");
+        },
+        replacement: function (content, node) {
+          var href = (node.getAttribute("href") || "").replace(/\\/$/, "");
+          var name = href.split("/").filter(Boolean).pop() || content;
+          try { name = decodeURIComponent(name); } catch (e) {}
+          return "[[" + (content || name) + "]]";
+        },
+      });
+      return (td.turndown(div.innerHTML) || plain).trim().slice(0, 8000);
+    } catch (err) {
+      return plain.slice(0, 8000);
+    }
+  }
+
+  function showFloat(rect, quoteMd) {
     hideFloat();
     floatBtn = document.createElement("button");
     floatBtn.type = "button";
     floatBtn.className = "tftb-suggest-float";
     floatBtn.textContent = "Suggest edit";
-    floatBtn.title = "Suggest an edit for this selection";
+    floatBtn.title = "Suggest an edit for this selection (markdown)";
     floatBtn.style.left = (rect.left + rect.width / 2 + window.scrollX) + "px";
     floatBtn.style.top = (rect.top + window.scrollY) + "px";
     floatBtn.addEventListener("mousedown", function (e) {
-      // keep selection until click handled
       e.preventDefault();
     });
     floatBtn.addEventListener("click", function (e) {
       e.preventDefault();
       e.stopPropagation();
-      openModal({ mode: "quote", quote: quote });
+      openModal({ mode: "quote", quote: quoteMd });
       hideFloat();
     });
     document.body.appendChild(floatBtn);
@@ -236,7 +291,6 @@ export default (() => {
       hideFloat();
       return;
     }
-    // only in main article content
     if (!el.closest("article, .center, .page-content, #quartz-body")) {
       hideFloat();
       return;
@@ -244,17 +298,29 @@ export default (() => {
     if (el.closest(".tftb-suggest-modal, .tftb-suggest-global, .tftb-suggest-float")) {
       return;
     }
+    var range, rect;
     try {
-      var range = sel.getRangeAt(0);
-      var rect = range.getBoundingClientRect();
+      range = sel.getRangeAt(0);
+      rect = range.getBoundingClientRect();
       if (!rect || (rect.width === 0 && rect.height === 0)) {
         hideFloat();
         return;
       }
-      showFloat(rect, text.slice(0, 4000));
     } catch (err) {
       hideFloat();
+      return;
     }
+    ensureTurndown().then(function () {
+      // selection may have changed while loading
+      var sel2 = window.getSelection && window.getSelection();
+      if (!sel2 || sel2.isCollapsed) return;
+      var md = selectionToMarkdown();
+      if (!md) return;
+      var r2 = sel2.getRangeAt(0).getBoundingClientRect();
+      showFloat(r2, md);
+    }).catch(function () {
+      showFloat(rect, text.slice(0, 8000));
+    });
   }
 
   var backdrop = null;
@@ -278,15 +344,15 @@ export default (() => {
       "<h2>" + (mode === "quote" ? "Suggest an edit" : "Suggest a global edit") + "</h2>" +
       '<p class="meta">On: <strong></strong></p>' +
       (mode === "quote"
-        ? '<label>Quoted selection</label><div class="quote"></div>' +
-          "<label for=\\"tftb-rewrite\\">Your rewrite</label>" +
-          '<textarea id="tftb-rewrite"></textarea>' +
+        ? '<label>Quoted markdown</label><pre class="quote"></pre>' +
+          "<label for=\\"tftb-rewrite\\">Your rewrite (markdown)</label>" +
+          '<textarea id="tftb-rewrite" class="tftb-md" spellcheck="true"></textarea>' +
           "<label for=\\"tftb-comment\\">Comment (optional)</label>" +
           '<textarea id="tftb-comment" placeholder="Why this change?"></textarea>'
         : "<label for=\\"tftb-subject\\">Subject</label>" +
           '<input id="tftb-subject" />' +
-          "<label for=\\"tftb-body\\">What should change?</label>" +
-          '<textarea id="tftb-body" placeholder="Describe the edit, or paste proposed text…"></textarea>') +
+          "<label for=\\"tftb-body\\">Suggestion (markdown)</label>" +
+          '<textarea id="tftb-body" class="tftb-md" placeholder="Write markdown for the proposed change…"></textarea>') +
       '<div class="tftb-suggest-actions">' +
       '<button type="button" class="cancel">Cancel</button>' +
       '<button type="button" class="primary submit">Send</button>' +
@@ -334,7 +400,7 @@ export default (() => {
       subject = "Edit: " + (meta.title || meta.page);
       quoteOut = quote;
       body = [];
-      if (rewrite) body.push("**Proposed text:**\\n\\n" + rewrite);
+      if (rewrite) body.push("**Proposed markdown:**\\n\\n```md\\n" + rewrite + "\\n```");
       if (comment) body.push("**Comment:**\\n\\n" + comment);
       body = body.join("\\n\\n");
     } else {
