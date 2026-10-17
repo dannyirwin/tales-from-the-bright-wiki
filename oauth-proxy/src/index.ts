@@ -264,8 +264,10 @@ function pageShell(title: string, body: string): string {
       cursor: pointer;
     }
     button:hover { filter: brightness(1.06); }
+    button:disabled { opacity: 0.55; cursor: default; pointer-events: none; filter: none; }
     .err { color: #b00020; margin-top: 0.85rem; font-size: 0.9rem; }
     .ok { color: #0a7; margin-top: 0.85rem; font-size: 0.9rem; }
+    .pending { color: var(--gray); margin-top: 0.85rem; font-size: 0.9rem; }
     .quote {
       border-left: 3px solid var(--secondary);
       padding-left: 0.75rem;
@@ -305,9 +307,13 @@ function loginHtml(returnUrl: string): string {
   <script>
     const form = document.getElementById("f");
     const msg = document.getElementById("msg");
+    const btn = form.querySelector('button[type="submit"]');
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
+      if (btn.disabled) return;
       msg.hidden = true;
+      btn.disabled = true;
+      btn.textContent = "Signing in…";
       const data = Object.fromEntries(new FormData(form).entries());
       try {
         const res = await fetch("/api/login", {
@@ -318,16 +324,26 @@ function loginHtml(returnUrl: string): string {
         const json = await res.json().catch(() => ({}));
         if (!res.ok) {
           msg.hidden = false;
+          msg.className = "err";
           msg.textContent = json.error || "Login failed";
+          btn.disabled = false;
+          btn.textContent = "Enter the wiki";
           return;
         }
+        msg.hidden = false;
+        msg.className = "ok";
+        msg.textContent = "Signed in…";
+        btn.textContent = "Signed in";
         const returnUrl = data.returnUrl || ${JSON.stringify(DEFAULT_WIKI_BASE)};
         const u = new URL(returnUrl, ${JSON.stringify(DEFAULT_WIKI_BASE)});
         u.hash = "tftb_token=" + encodeURIComponent(json.token);
         location.href = u.toString();
       } catch {
         msg.hidden = false;
+        msg.className = "err";
         msg.textContent = "Network error — try again.";
+        btn.disabled = false;
+        btn.textContent = "Enter the wiki";
       }
     });
   </script>`,

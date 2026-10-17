@@ -307,7 +307,14 @@ export default (() => {
     color: var(--light);
     filter: brightness(1.05);
   }
+  .tftb-suggest-actions button:disabled {
+    opacity: 0.55;
+    cursor: default;
+    pointer-events: none;
+    filter: none;
+  }
   .tftb-suggest-msg { margin-top: 0.65rem; font-size: 0.9rem; }
+  .tftb-suggest-msg.pending { color: var(--gray); }
   .tftb-suggest-msg.err { color: #b00020; }
   .tftb-suggest-msg.ok { color: #0a7; }
   `
@@ -884,21 +891,35 @@ export default (() => {
     var s = requireAuth();
     if (!s) return;
     var msg = modal.querySelector(".tftb-suggest-msg");
+    var submitBtn = modal.querySelector(".submit");
+    var cancelBtn = modal.querySelector(".cancel");
+    if (submitBtn && submitBtn.disabled) return;
+
+    function setBusy(busy) {
+      if (submitBtn) {
+        submitBtn.disabled = !!busy;
+        submitBtn.textContent = busy ? "Sending…" : "Send";
+      }
+      if (cancelBtn) cancelBtn.disabled = !!busy;
+    }
+
+    function showStatus(kind, text) {
+      msg.hidden = false;
+      msg.className = "tftb-suggest-msg " + kind;
+      msg.textContent = text;
+    }
+
     msg.hidden = true;
 
     var file = (modal.querySelector("#tftb-file").value || "").trim().replace(/^\\/+/, "");
     var message = readMessage(modal);
     if (!file) {
-      msg.hidden = false;
-      msg.className = "tftb-suggest-msg err";
-      msg.textContent = "Add a file path.";
+      showStatus("err", "Add a file path.");
       return;
     }
     if (!/\\.md$/i.test(file)) file = file + ".md";
     if (!message) {
-      msg.hidden = false;
-      msg.className = "tftb-suggest-msg err";
-      msg.textContent = "Write something in the message editor.";
+      showStatus("err", "Write something in the message editor.");
       return;
     }
 
@@ -912,6 +933,9 @@ export default (() => {
       "**File:** \`" + file + "\`\\n" +
       (mode !== "new" ? "**Page URL:** " + meta.url + "\\n" : "") +
       "\\n**Suggested:**\\n\\n\`\`\`md\\n" + message + "\\n\`\`\`";
+
+    setBusy(true);
+    showStatus("pending", "Sending suggestion…");
 
     try {
       var res = await fetch(WORKER + "/api/suggest", {
@@ -936,19 +960,16 @@ export default (() => {
         return;
       }
       if (!res.ok) {
-        msg.hidden = false;
-        msg.className = "tftb-suggest-msg err";
-        msg.textContent = json.error || ("Failed (" + res.status + ")");
+        setBusy(false);
+        showStatus("err", json.error || ("Failed (" + res.status + ")"));
         return;
       }
-      msg.hidden = false;
-      msg.className = "tftb-suggest-msg ok";
-      msg.textContent = "Thanks — suggestion sent.";
+      showStatus("ok", "Thanks — suggestion sent.");
+      if (submitBtn) submitBtn.textContent = "Sent";
       setTimeout(closeModal, 900);
     } catch (err) {
-      msg.hidden = false;
-      msg.className = "tftb-suggest-msg err";
-      msg.textContent = "Network error — try again.";
+      setBusy(false);
+      showStatus("err", "Network error — try again.");
     }
   }
 
