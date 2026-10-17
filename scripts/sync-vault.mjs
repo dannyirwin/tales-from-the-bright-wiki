@@ -83,7 +83,7 @@ function ensureIndexPublish() {
   if (!fs.existsSync(indexPath)) {
     fs.writeFileSync(
       indexPath,
-      `---\ntitle: Tales From the Bright\npublish: true\n---\n\n# Tales From the Bright\n\nCampaign wiki for **Into the Arecene**.\n`,
+      `---\ntitle: Tales from the Bright\npublish: true\n---\n\n# Tales from the Bright\n\nCampaign wiki for **Into the Arecene**.\n`,
     )
     return
   }

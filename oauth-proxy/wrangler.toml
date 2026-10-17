@@ -9,3 +9,5 @@ name = "tales-from-the-bright-wiki-decap"
 [vars]
 GITHUB_REPO = "dannyirwin/tales-from-the-bright-wiki"
 WIKI_ORIGIN = "https://dannyirwin.github.io"
+WIKI_BASE = "https://dannyirwin.github.io/tales-from-the-bright-wiki"
+SESSION_DAYS = "30"

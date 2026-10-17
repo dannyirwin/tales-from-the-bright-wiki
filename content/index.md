@@ -3,7 +3,7 @@ title: "Home: Tales from the Bright"
 publish: true
 ---
 
-The campaign wiki for Tales From the Bright
+The campaign wiki for Tales from the Bright
 ## About this Project
 
 The number one goal of this wiki project is just for me to learn [Obsidian](https://obsidian.md/), a program for note taking and organization. Its boring and will probably end up completely ignored by me 3 sessions in. But this wiki is automatically generated and kept up to date with a little setup in GitHub for free and with 0 additional work from me.

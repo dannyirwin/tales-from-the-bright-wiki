@@ -2,6 +2,7 @@ import { loadQuartzConfig, loadQuartzLayout } from "./quartz/plugins/loader/conf
 import { PageTypes } from "./quartz/plugins"
 import PageTitle from "./quartz/components/PageTitle"
 import SiteMeta from "./quartz/components/SiteMeta"
+import AuthGate from "./quartz/components/AuthGate"
 import SuggestEdit from "./quartz/components/SuggestEdit"
 import OutgoingLinks from "./quartz/components/OutgoingLinks"
 import { QuartzComponent } from "./quartz/components/types"
@@ -52,12 +53,15 @@ for (const pageType of Object.values(layout.byPageType)) {
   pageType.right = withOutgoingLinks(pageType.right)
 }
 
+const authGate = AuthGate()
 const suggestEdit = SuggestEdit()
 const siteMeta = SiteMeta()
 const footer = [...(layout.defaults.footer ?? []), suggestEdit, siteMeta]
 layout.defaults.footer = footer
+layout.defaults.beforeBody = [authGate, ...(layout.defaults.beforeBody ?? [])]
 for (const pageType of Object.values(layout.byPageType)) {
   pageType.footer = footer
+  pageType.beforeBody = [authGate, ...(pageType.beforeBody ?? [])]
 }
 
 config.plugins.emitters = config.plugins.emitters.filter((e) => e.name !== "PageTypeDispatcher")
