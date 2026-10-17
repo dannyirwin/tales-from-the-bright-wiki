@@ -419,8 +419,8 @@ export default (() => {
     var editPage = document.createElement("button");
     editPage.type = "button";
     editPage.className = "icon-only";
-    editPage.setAttribute("aria-label", "Edit this page");
-    editPage.title = "Edit this page (whole file or your own message)";
+    editPage.setAttribute("aria-label", "Suggest an edit");
+    editPage.title = "Suggest an edit to this page";
     editPage.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
     editPage.addEventListener("click", function (e) {
       e.preventDefault();
@@ -513,8 +513,8 @@ export default (() => {
     floatBtn = document.createElement("button");
     floatBtn.type = "button";
     floatBtn.className = "tftb-suggest-float";
-    floatBtn.setAttribute("aria-label", "Suggest edit");
-    floatBtn.title = "Edit this highlighted text";
+    floatBtn.setAttribute("aria-label", "Suggest an edit");
+    floatBtn.title = "Suggest an edit";
     floatBtn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
     floatBtn.style.left = (rect.left + rect.width / 2 + window.scrollX) + "px";
     floatBtn.style.top = (rect.top + window.scrollY) + "px";
@@ -591,48 +591,119 @@ export default (() => {
     );
   }
 
-  function tftbToolBtn(tooltip, svg) {
+  function tftbToolBtn(tooltip, svg, extraClass) {
     var btn = document.createElement("button");
     btn.type = "button";
-    btn.className = "tftb-ed-btn";
+    btn.className = "tftb-ed-btn" + (extraClass ? " " + extraClass : "");
     btn.title = tooltip;
     btn.setAttribute("aria-label", tooltip);
     btn.innerHTML = svg;
+    // Preserve wysiwyg selection when clicking the toolbar
+    btn.addEventListener("mousedown", function (e) {
+      e.preventDefault();
+    });
     return btn;
   }
 
   function tftbToolbarItems() {
-    function item(tooltip, svg, command, state, payload) {
-      var btn = tftbToolBtn(tooltip, svg);
-      var cfg = {
-        name: command + (payload ? String(payload.level || "") : ""),
+    // Custom `el` items must wire clicks via onMounted(execCommand) — Toast won't.
+    function item(tooltip, svg, command, state, opts) {
+      opts = opts || {};
+      var btn = tftbToolBtn(tooltip, svg, opts.popupClass || "");
+      return {
+        name: "tftb-" + (command || opts.popupClass || "item"),
         el: btn,
-        command: command,
         tooltip: tooltip,
-        state: state,
+        state: state || undefined,
+        onMounted: function (execCommand) {
+          btn.addEventListener("click", function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (opts.popup) {
+              try {
+                if (mdEditor && mdEditor.eventEmitter) {
+                  mdEditor.eventEmitter.emit("openPopup", opts.popup);
+                }
+              } catch (err) {}
+              return;
+            }
+            try {
+              if (opts.payload) execCommand(command, opts.payload);
+              else execCommand(command);
+            } catch (err) {}
+            try {
+              if (mdEditor) mdEditor.focus();
+            } catch (err2) {}
+          });
+        },
         onUpdated: function (s) {
           btn.classList.toggle("active", !!(s && s.active));
           btn.disabled = !!(s && s.disabled);
         },
       };
-      if (payload) cfg.payload = payload;
-      return cfg;
     }
     return [
       [
-        item("Heading", tftbIcon('<path d="M6 4v16"/><path d="M18 4v16"/><path d="M6 12h12"/>'), "heading", "heading", { level: 2 }),
-        item("Bold", tftbIcon('<path d="M7 5h6.5a3.5 3.5 0 0 1 0 7H7z"/><path d="M7 12h7.5a3.5 3.5 0 0 1 0 7H7z"/>'), "bold", "strong"),
-        item("Italic", tftbIcon('<path d="M19 4h-9"/><path d="M14 20H5"/><path d="M15 4 9 20"/>'), "italic", "emph"),
-        item("Strikethrough", tftbIcon('<path d="M16 4H9a3 3 0 0 0 0 6h6a3 3 0 0 1 0 6H8"/><path d="M4 12h16"/>'), "strike", "strike"),
+        item(
+          "Heading",
+          tftbIcon('<path d="M6 4v16"/><path d="M18 4v16"/><path d="M6 12h12"/>'),
+          "heading",
+          "heading",
+          { payload: { level: 2 } },
+        ),
+        item(
+          "Bold",
+          tftbIcon('<path d="M7 5h6.5a3.5 3.5 0 0 1 0 7H7z"/><path d="M7 12h7.5a3.5 3.5 0 0 1 0 7H7z"/>'),
+          "bold",
+          "strong",
+        ),
+        item(
+          "Italic",
+          tftbIcon('<path d="M19 4h-9"/><path d="M14 20H5"/><path d="M15 4 9 20"/>'),
+          "italic",
+          "emph",
+        ),
+        item(
+          "Strikethrough",
+          tftbIcon('<path d="M16 4H9a3 3 0 0 0 0 6h6a3 3 0 0 1 0 6H8"/><path d="M4 12h16"/>'),
+          "strike",
+          "strike",
+        ),
       ],
       [
-        item("Quote", tftbIcon('<path d="M3 21c3 0 7-1 7-8V5H3v8h5c0 5-2 8-5 8z"/><path d="M14 21c3 0 7-1 7-8V5h-7v8h5c0 5-2 8-5 8z"/>'), "quote", "blockQuote"),
-        item("Bullet list", tftbIcon('<path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/>'), "ul", "bulletList"),
-        item("Numbered list", tftbIcon('<path d="M10 6h11"/><path d="M10 12h11"/><path d="M10 18h11"/><path d="M4 6h1v4"/><path d="M4 10h2"/><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/>'), "ol", "orderedList"),
+        item(
+          "Quote",
+          tftbIcon('<path d="M3 21c3 0 7-1 7-8V5H3v8h5c0 5-2 8-5 8z"/><path d="M14 21c3 0 7-1 7-8V5h-7v8h5c0 5-2 8-5 8z"/>'),
+          "blockQuote",
+          "blockQuote",
+        ),
+        item(
+          "Bullet list",
+          tftbIcon('<path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/>'),
+          "bulletList",
+          "bulletList",
+        ),
+        item(
+          "Numbered list",
+          tftbIcon('<path d="M10 6h11"/><path d="M10 12h11"/><path d="M10 18h11"/><path d="M4 6h1v4"/><path d="M4 10h2"/><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/>'),
+          "orderedList",
+          "orderedList",
+        ),
       ],
       [
-        item("Link", tftbIcon('<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>'), "link", null),
-        item("Horizontal rule", tftbIcon('<path d="M4 12h16"/>'), "hr", "thematicBreak"),
+        item(
+          "Link",
+          tftbIcon('<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>'),
+          null,
+          null,
+          { popup: "link", popupClass: "link" },
+        ),
+        item(
+          "Horizontal rule",
+          tftbIcon('<path d="M4 12h16"/>'),
+          "hr",
+          "thematicBreak",
+        ),
       ],
     ];
   }
@@ -667,7 +738,7 @@ export default (() => {
   function modeCopy(mode) {
     if (mode === "quote") {
       return {
-        title: "Edit selection",
+        title: "Suggest an edit",
         meta: "This suggestion is for the current page. The editor starts with your highlight — change it or add a note.",
         placeholder: "Edit the highlighted text…",
       };
@@ -680,7 +751,7 @@ export default (() => {
       };
     }
     return {
-      title: "Edit this page",
+      title: "Suggest an edit",
       meta: "This suggestion is for the current page. Edit the page, or replace it with your own message.",
       placeholder: "Edit the page, or write your own suggestion…",
     };
@@ -717,6 +788,7 @@ export default (() => {
       "</div>";
 
     var modal = backdrop.querySelector(".tftb-suggest-modal");
+    modal.setAttribute("aria-label", copy.title);
     modal.querySelector("h2").textContent = copy.title;
     modal.querySelector(".meta").textContent = copy.meta;
     var fileInput = modal.querySelector("#tftb-file");
