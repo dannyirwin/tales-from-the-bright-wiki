@@ -153,23 +153,134 @@ function pageShell(title: string, body: string): string {
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>${escapeHtml(title)}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;700&family=Source+Sans+Pro:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet" />
   <style>
-    :root { color-scheme: light dark; font-family: system-ui, sans-serif; }
-    body { max-width: 36rem; margin: 2rem auto; padding: 0 1rem; line-height: 1.45; }
-    h1 { font-size: 1.35rem; margin-bottom: 0.35rem; }
-    .meta { color: #666; font-size: 0.9rem; margin-bottom: 1.25rem; }
-    label { display: block; font-weight: 600; margin: 0.75rem 0 0.25rem; }
-    input, textarea { width: 100%; box-sizing: border-box; padding: 0.5rem; font: inherit; }
+    :root {
+      color-scheme: light dark;
+      --light: #faf8f8;
+      --lightgray: #e5e5e5;
+      --gray: #b8b8b8;
+      --darkgray: #4e4e4e;
+      --dark: #2b2b2b;
+      --secondary: #284b63;
+      --tertiary: #84a59d;
+      --highlight: rgba(143, 159, 169, 0.15);
+      --titleFont: "Schibsted Grotesk", system-ui, sans-serif;
+      --bodyFont: "Source Sans Pro", system-ui, sans-serif;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --light: #161618;
+        --lightgray: #393639;
+        --gray: #646464;
+        --darkgray: #d4d4d4;
+        --dark: #ebebec;
+        --secondary: #7b97aa;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: var(--bodyFont);
+      font-size: 1rem;
+      line-height: 1.55;
+      color: var(--darkgray);
+      background:
+        radial-gradient(ellipse 80% 50% at 50% -10%, color-mix(in srgb, var(--secondary) 18%, transparent), transparent),
+        var(--light);
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 10vh 1rem 3rem;
+    }
+    .shell {
+      width: min(26rem, 100%);
+      background: var(--light);
+      color: var(--darkgray);
+      border: 1px solid var(--lightgray);
+      border-radius: 0.5rem;
+      padding: 1.35rem 1.4rem 1.5rem;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.12);
+    }
+    .brand {
+      margin: 0 0 0.85rem;
+      font-family: var(--titleFont);
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--dark);
+      letter-spacing: -0.02em;
+    }
+    h1 {
+      margin: 0 0 0.35rem;
+      font-family: var(--titleFont);
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--dark);
+    }
+    .meta {
+      color: var(--gray);
+      font-size: 0.9rem;
+      margin: 0 0 1.1rem;
+    }
+    label {
+      display: block;
+      font-weight: 600;
+      font-size: 0.85rem;
+      margin: 0.75rem 0 0.3rem;
+      color: var(--darkgray);
+    }
+    input, textarea {
+      width: 100%;
+      font: inherit;
+      padding: 0.5rem 0.65rem;
+      border: 1px solid var(--lightgray);
+      border-radius: 0.35rem;
+      background: var(--light);
+      color: var(--darkgray);
+    }
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: var(--secondary);
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--secondary) 25%, transparent);
+    }
     textarea { min-height: 10rem; resize: vertical; }
-    button { margin-top: 1rem; padding: 0.55rem 1rem; font: inherit; cursor: pointer; }
-    .err { color: #b00020; margin-top: 0.75rem; }
-    .ok { color: #0a7; margin-top: 0.75rem; }
-    .quote { border-left: 3px solid #888; padding-left: 0.75rem; margin: 0.75rem 0; white-space: pre-wrap; }
-    a { color: inherit; }
+    button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 1.15rem;
+      height: 2.35rem;
+      padding: 0 1.1rem;
+      font: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border-radius: 999px;
+      border: 1px solid var(--secondary);
+      background: var(--secondary);
+      color: var(--light);
+      cursor: pointer;
+    }
+    button:hover { filter: brightness(1.06); }
+    .err { color: #b00020; margin-top: 0.85rem; font-size: 0.9rem; }
+    .ok { color: #0a7; margin-top: 0.85rem; font-size: 0.9rem; }
+    .quote {
+      border-left: 3px solid var(--secondary);
+      padding-left: 0.75rem;
+      margin: 0.75rem 0;
+      white-space: pre-wrap;
+      color: var(--gray);
+    }
+    a { color: var(--secondary); font-weight: 600; text-decoration: none; }
+    a:hover { color: var(--tertiary); }
   </style>
 </head>
 <body>
+<div class="shell">
 ${body}
+</div>
 </body>
 </html>`
 }
@@ -177,8 +288,9 @@ ${body}
 function loginHtml(returnUrl: string): string {
   const ret = escapeHtml(returnUrl)
   return pageShell(
-    "Sign in — Tales from the Bright",
+    "Sign in — Tales From the Bright",
     `
+  <p class="brand">Tales From the Bright</p>
   <h1>Sign in</h1>
   <p class="meta">Enter your name and your previous character’s name.</p>
   <form id="f">
@@ -243,8 +355,9 @@ function suggestHtml(prefill: {
     ? `<p class="meta">Quoted from the page:</p><blockquote class="quote">${quote}</blockquote>`
     : ""
   return pageShell(
-    "Suggest an edit — Tales from the Bright",
+    "Suggest an edit — Tales From the Bright",
     `
+  <p class="brand">Tales From the Bright</p>
   <h1>Suggest an edit</h1>
   <p class="meta">
     ${title || page ? `About: <strong>${title || page}</strong>` : "General wiki suggestion"}
