@@ -613,7 +613,7 @@ export default (() => {
   }
 
   function tftbToolbarItems() {
-    // Custom `el` items must wire clicks via onMounted(execCommand) — Toast won't.
+    // Custom el toolbar items must wire clicks via onMounted(execCommand) — Toast will not.
     function item(tooltip, svg, command, state, opts) {
       opts = opts || {};
       var btn = tftbToolBtn(tooltip, svg, opts.popupClass || "");
