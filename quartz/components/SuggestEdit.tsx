@@ -95,27 +95,144 @@ export default (() => {
   .tftb-suggest-modal .tftb-md-editor {
     margin-top: 0.15rem;
     border: 1px solid var(--lightgray);
-    border-radius: 0.3rem;
+    border-radius: 0.4rem;
     overflow: hidden;
+    background: var(--light);
   }
   .tftb-suggest-modal .toastui-editor-defaultUI {
-    border: none;
+    border: none !important;
+    border-radius: 0;
   }
-  .tftb-suggest-modal .toastui-editor-defaultUI-toolbar,
+  .tftb-suggest-modal .toastui-editor-defaultUI-toolbar {
+    background: var(--light) !important;
+    border: none !important;
+    border-bottom: 1px solid var(--lightgray) !important;
+    padding: 0.35rem 0.4rem !important;
+    height: auto !important;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2rem;
+    align-items: center;
+  }
+  .tftb-suggest-modal .toastui-editor-toolbar-group {
+    display: flex;
+    gap: 0.2rem;
+    align-items: center;
+    margin: 0 !important;
+  }
+  .tftb-suggest-modal .toastui-editor-toolbar-divider {
+    background-color: var(--lightgray) !important;
+    margin: 0 0.25rem !important;
+    height: 1.1rem !important;
+  }
   .tftb-suggest-modal .toastui-editor-mode-switch {
-    background: var(--light);
-    border-color: var(--lightgray);
+    display: none !important;
   }
+  .tftb-suggest-modal .tftb-ed-btn {
+    width: 2rem;
+    height: 2rem;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    background: transparent !important;
+    background-image: none !important;
+    color: var(--darkgray);
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-sizing: border-box;
+  }
+  .tftb-suggest-modal .tftb-ed-btn:hover {
+    color: var(--secondary);
+    border-color: var(--secondary);
+  }
+  .tftb-suggest-modal .tftb-ed-btn.active {
+    color: var(--secondary);
+    background: color-mix(in srgb, var(--secondary) 12%, var(--light)) !important;
+    border-color: var(--secondary);
+  }
+  .tftb-suggest-modal .tftb-ed-btn:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+  .tftb-suggest-modal .tftb-ed-btn svg {
+    width: 1.05rem;
+    height: 1.05rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.75;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .tftb-suggest-modal .toastui-editor-main,
   .tftb-suggest-modal .toastui-editor-ww-container,
   .tftb-suggest-modal .toastui-editor-contents {
-    background: var(--light);
-    color: var(--darkgray);
-    font-size: 0.95rem;
+    background: var(--light) !important;
+    color: var(--darkgray) !important;
+  }
+  .tftb-suggest-modal .toastui-editor-contents {
+    font-family: var(--bodyFont), system-ui, sans-serif;
+    font-size: 1rem;
+    line-height: 1.55;
+    padding: 0.85rem 1rem !important;
   }
   .tftb-suggest-modal .toastui-editor-contents h1,
   .tftb-suggest-modal .toastui-editor-contents h2,
-  .tftb-suggest-modal .toastui-editor-contents h3 {
+  .tftb-suggest-modal .toastui-editor-contents h3,
+  .tftb-suggest-modal .toastui-editor-contents h4 {
+    font-family: var(--titleFont), var(--bodyFont), system-ui, sans-serif;
     color: var(--darkgray);
+    margin: 1rem 0 0.4rem;
+  }
+  .tftb-suggest-modal .toastui-editor-contents a {
+    color: var(--secondary);
+    font-weight: 600;
+  }
+  .tftb-suggest-modal .toastui-editor-contents blockquote {
+    border-left: 3px solid var(--secondary);
+    color: var(--gray);
+    margin: 0.75rem 0;
+    padding-left: 0.75rem;
+  }
+  .tftb-suggest-modal .toastui-editor-contents code {
+    background: var(--highlight, color-mix(in srgb, var(--lightgray) 35%, var(--light)));
+    border-radius: 0.25rem;
+    padding: 0.05rem 0.3rem;
+    font-size: 0.9em;
+  }
+  .tftb-suggest-modal .toastui-editor-tooltip {
+    background: var(--dark) !important;
+    color: var(--light) !important;
+  }
+  .tftb-suggest-modal .toastui-editor-popup {
+    border: 1px solid var(--lightgray) !important;
+    border-radius: 0.4rem !important;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.18) !important;
+    background: var(--light) !important;
+    color: var(--darkgray) !important;
+  }
+  .tftb-suggest-modal .toastui-editor-popup-body label {
+    color: var(--darkgray) !important;
+  }
+  .tftb-suggest-modal .toastui-editor-popup-body input[type="text"] {
+    border: 1px solid var(--lightgray) !important;
+    border-radius: 0.3rem !important;
+    background: var(--light) !important;
+    color: var(--darkgray) !important;
+  }
+  .tftb-suggest-modal .toastui-editor-popup-body .toastui-editor-ok-button {
+    background: var(--secondary) !important;
+    border-color: var(--secondary) !important;
+    color: var(--light) !important;
+    border-radius: 999px !important;
+  }
+  .tftb-suggest-modal .toastui-editor-popup-body .toastui-editor-close-button {
+    border: 1px solid var(--lightgray) !important;
+    border-radius: 999px !important;
+    background: var(--light) !important;
+    color: var(--darkgray) !important;
   }
   .tftb-suggest-modal h2 {
     margin: 0 0 0.35rem;
@@ -155,17 +272,28 @@ export default (() => {
   }
   .tftb-suggest-actions button {
     font: inherit;
-    padding: 0.4rem 0.85rem;
-    border-radius: 0.3rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.4rem 0.9rem;
+    height: 2.25rem;
+    border-radius: 999px;
     cursor: pointer;
     border: 1px solid var(--lightgray);
     background: var(--light);
     color: var(--darkgray);
   }
+  .tftb-suggest-actions button:hover {
+    color: var(--secondary);
+    border-color: var(--secondary);
+  }
   .tftb-suggest-actions button.primary {
     background: var(--secondary);
     border-color: var(--secondary);
     color: var(--light);
+  }
+  .tftb-suggest-actions button.primary:hover {
+    color: var(--light);
+    filter: brightness(1.05);
   }
   .tftb-suggest-msg { margin-top: 0.65rem; font-size: 0.9rem; }
   .tftb-suggest-msg.err { color: #b00020; }
@@ -195,16 +323,75 @@ export default (() => {
   }
 
   function pageMeta() {
-    var path = location.pathname || "";
-    if (path.indexOf(BASE) === 0) path = path.slice(BASE.length);
-    path = path.replace(/^\\/+/, "").replace(/\\/+$/, "") || "index";
+    var slugAttr = document.body && document.body.getAttribute("data-slug");
+    var path = slugAttr || location.pathname || "";
+    if (!slugAttr) {
+      if (path.indexOf(BASE) === 0) path = path.slice(BASE.length);
+      path = path.replace(/^\\/+/, "").replace(/\\/+$/, "") || "index";
+    }
+    path = String(path).replace(/\\/+$/, "") || "index";
     var h1 = document.querySelector("article h1, .center h1, h1");
     var title = (h1 && h1.textContent || path).trim();
     return { page: path, title: title, url: location.href.split("#")[0] };
   }
 
-  function currentFilePath(meta) {
+  // URL slugs are kebab-case; vault files keep spaces/casing (Mount Steradian.md)
+  function fallbackFilePath(meta) {
     return meta.page === "index" ? "index.md" : meta.page + ".md";
+  }
+
+  function loadContentIndex() {
+    if (window.fetchData) return window.fetchData;
+    return fetch(BASE + "/static/contentIndex.json", { cache: "no-store" }).then(function (r) {
+      if (!r.ok) throw new Error("index");
+      return r.json();
+    });
+  }
+
+  function resolveFilePath(meta) {
+    var slug = (meta.page || "").toLowerCase();
+    return loadContentIndex()
+      .then(function (idx) {
+        if (!idx || typeof idx !== "object") return fallbackFilePath(meta);
+        var entry = idx[slug] || idx[meta.page];
+        if (!entry) {
+          for (var k in idx) {
+            if (!Object.prototype.hasOwnProperty.call(idx, k)) continue;
+            var e = idx[k];
+            if (e && (e.slug === slug || e.slug === meta.page || String(k).toLowerCase() === slug)) {
+              entry = e;
+              break;
+            }
+          }
+        }
+        if (entry && entry.filePath) return entry.filePath;
+        return fallbackFilePath(meta);
+      })
+      .catch(function () {
+        return fallbackFilePath(meta);
+      });
+  }
+
+  function encodeRawPath(filePath) {
+    return String(filePath || "")
+      .replace(/^\\/+/, "")
+      .split("/")
+      .map(function (seg) {
+        return encodeURIComponent(seg);
+      })
+      .join("/");
+  }
+
+  // Toast WYSIWYG mangles --- frontmatter; keep it aside and reattach on submit
+  function splitFrontmatter(md) {
+    var text = String(md || "").replace(/^\\uFEFF/, "");
+    if (!/^---(?:\\r?\\n|$)/.test(text)) return { frontmatter: "", body: text };
+    var match = text.match(/^---\\r?\\n([\\s\\S]*?)\\r?\\n---(?:\\r?\\n|$)([\\s\\S]*)$/);
+    if (!match) return { frontmatter: "", body: text };
+    return {
+      frontmatter: "---\\n" + match[1] + "\\n---\\n",
+      body: match[2].replace(/^\\r?\\n/, ""),
+    };
   }
 
   function logout() {
@@ -385,6 +572,58 @@ export default (() => {
     mdEditor = null;
   }
 
+  function tftbIcon(paths) {
+    return (
+      '<svg viewBox="0 0 24 24" aria-hidden="true">' + paths + "</svg>"
+    );
+  }
+
+  function tftbToolBtn(tooltip, svg) {
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "tftb-ed-btn";
+    btn.title = tooltip;
+    btn.setAttribute("aria-label", tooltip);
+    btn.innerHTML = svg;
+    return btn;
+  }
+
+  function tftbToolbarItems() {
+    function item(tooltip, svg, command, state, payload) {
+      var btn = tftbToolBtn(tooltip, svg);
+      var cfg = {
+        name: command + (payload ? String(payload.level || "") : ""),
+        el: btn,
+        command: command,
+        tooltip: tooltip,
+        state: state,
+        onUpdated: function (s) {
+          btn.classList.toggle("active", !!(s && s.active));
+          btn.disabled = !!(s && s.disabled);
+        },
+      };
+      if (payload) cfg.payload = payload;
+      return cfg;
+    }
+    return [
+      [
+        item("Heading", tftbIcon('<path d="M6 4v16"/><path d="M18 4v16"/><path d="M6 12h12"/>'), "heading", "heading", { level: 2 }),
+        item("Bold", tftbIcon('<path d="M7 5h6.5a3.5 3.5 0 0 1 0 7H7z"/><path d="M7 12h7.5a3.5 3.5 0 0 1 0 7H7z"/>'), "bold", "strong"),
+        item("Italic", tftbIcon('<path d="M19 4h-9"/><path d="M14 20H5"/><path d="M15 4 9 20"/>'), "italic", "emph"),
+        item("Strikethrough", tftbIcon('<path d="M16 4H9a3 3 0 0 0 0 6h6a3 3 0 0 1 0 6H8"/><path d="M4 12h16"/>'), "strike", "strike"),
+      ],
+      [
+        item("Quote", tftbIcon('<path d="M3 21c3 0 7-1 7-8V5H3v8h5c0 5-2 8-5 8z"/><path d="M14 21c3 0 7-1 7-8V5h-7v8h5c0 5-2 8-5 8z"/>'), "quote", "blockQuote"),
+        item("Bullet list", tftbIcon('<path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/>'), "ul", "bulletList"),
+        item("Numbered list", tftbIcon('<path d="M10 6h11"/><path d="M10 12h11"/><path d="M10 18h11"/><path d="M4 6h1v4"/><path d="M4 10h2"/><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/>'), "ol", "orderedList"),
+      ],
+      [
+        item("Link", tftbIcon('<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>'), "link", null),
+        item("Horizontal rule", tftbIcon('<path d="M4 12h16"/>'), "hr", "thematicBreak"),
+      ],
+    ];
+  }
+
   function closeModal() {
     destroyMdEditor();
     if (backdrop) backdrop.remove();
@@ -392,16 +631,21 @@ export default (() => {
   }
 
   function readMessage(modal) {
+    var body = "";
     if (mdEditor) {
-      try { return (mdEditor.getMarkdown() || "").trim(); } catch (e) {}
+      try { body = (mdEditor.getMarkdown() || "").trim(); } catch (e) { body = ""; }
     }
-    var el = modal.querySelector("#tftb-message");
-    return ((el && el.value) || "").trim();
+    if (!body) {
+      var el = modal.querySelector("#tftb-message");
+      body = ((el && el.value) || "").trim();
+    }
+    var fm = (modal && modal.getAttribute("data-tftb-fm")) || "";
+    if (fm) return (fm.replace(/\\s*$/, "") + "\\n\\n" + body).trim();
+    return body;
   }
 
   function fetchPageMarkdown(filePath) {
-    var path = filePath.replace(/^\\/+/, "");
-    return fetch(RAW + path, { cache: "no-store" }).then(function (res) {
+    return fetch(RAW + encodeRawPath(filePath), { cache: "no-store" }).then(function (res) {
       if (!res.ok) throw new Error("fetch");
       return res.text();
     });
@@ -439,7 +683,7 @@ export default (() => {
     // Snapshot for the GitHub issue only (not shown in the UI)
     var original = mode === "quote" ? quote : "";
     var copy = modeCopy(mode);
-    var defaultFile = currentFilePath(meta);
+    var preservedFm = "";
 
     backdrop = document.createElement("div");
     backdrop.className = "tftb-suggest-backdrop";
@@ -464,6 +708,7 @@ export default (() => {
     modal.querySelector(".meta").textContent = copy.meta;
     var fileInput = modal.querySelector("#tftb-file");
     var message = modal.querySelector("#tftb-message");
+    var msgEl = modal.querySelector(".tftb-suggest-msg");
 
     if (mode === "new") {
       fileInput.readOnly = false;
@@ -472,8 +717,8 @@ export default (() => {
       message.value = "";
     } else {
       fileInput.readOnly = true;
-      fileInput.value = defaultFile;
-      fileInput.placeholder = defaultFile;
+      fileInput.value = "";
+      fileInput.placeholder = "Resolving file…";
       message.value = mode === "quote" ? quote : "";
     }
     message.placeholder = copy.placeholder;
@@ -489,6 +734,7 @@ export default (() => {
 
     var bootEditor = function (initial) {
       message.value = initial || "";
+      modal.setAttribute("data-tftb-fm", preservedFm || "");
       var mount = modal.querySelector("#tftb-md-editor");
       ensureToastEditor().then(function () {
         if (!backdrop || !mount || !document.body.contains(mount)) return;
@@ -496,14 +742,14 @@ export default (() => {
         mount.innerHTML = "";
         mdEditor = new window.toastui.Editor({
           el: mount,
-          height: "320px",
+          height: "420px",
           initialEditType: "wysiwyg",
-          previewStyle: "vertical",
-          hideModeSwitch: false,
+          hideModeSwitch: true,
           usageStatistics: false,
           autofocus: true,
           placeholder: copy.placeholder,
           initialValue: message.value || "",
+          toolbarItems: tftbToolbarItems(),
         });
       }).catch(function () {
         message.hidden = false;
@@ -512,25 +758,41 @@ export default (() => {
       });
     };
 
-    if (mode === "page") {
-      var msgEl = modal.querySelector(".tftb-suggest-msg");
-      msgEl.hidden = false;
-      msgEl.className = "tftb-suggest-msg";
-      msgEl.textContent = "Loading page markdown…";
-      fetchPageMarkdown(defaultFile).then(function (md) {
-        original = md || "";
-        msgEl.hidden = true;
-        bootEditor(md);
-      }).catch(function () {
-        original = "";
-        msgEl.hidden = false;
-        msgEl.className = "tftb-suggest-msg err";
-        msgEl.textContent = "Couldn’t load the file — you can still write a message.";
-        bootEditor("");
-      });
-    } else {
-      bootEditor(message.value);
+    if (mode === "new") {
+      bootEditor("");
+      return;
     }
+
+    msgEl.hidden = false;
+    msgEl.className = "tftb-suggest-msg";
+    msgEl.textContent = mode === "page" ? "Loading page markdown…" : "Resolving file…";
+
+    resolveFilePath(meta).then(function (filePath) {
+      fileInput.value = filePath;
+      fileInput.placeholder = filePath;
+      if (mode !== "page") {
+        msgEl.hidden = true;
+        bootEditor(message.value);
+        return;
+      }
+      return fetchPageMarkdown(filePath).then(function (md) {
+        original = md || "";
+        var parts = splitFrontmatter(md || "");
+        preservedFm = parts.frontmatter;
+        msgEl.hidden = true;
+        bootEditor(parts.body);
+      });
+    }).catch(function () {
+      fileInput.value = fallbackFilePath(meta);
+      fileInput.placeholder = fileInput.value;
+      original = "";
+      preservedFm = "";
+      modal.setAttribute("data-tftb-fm", "");
+      msgEl.hidden = false;
+      msgEl.className = "tftb-suggest-msg err";
+      msgEl.textContent = "Couldn’t load the file — you can still write a message.";
+      bootEditor(mode === "quote" ? quote : "");
+    });
   }
 
   async function submitSuggestion(mode, meta, original, modal) {
