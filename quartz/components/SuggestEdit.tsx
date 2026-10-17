@@ -85,13 +85,41 @@ export default (() => {
     overflow: auto;
   }
   .tftb-suggest-modal {
-    width: min(32rem, 100%);
+    width: min(36rem, 100%);
     background: var(--light);
     color: var(--darkgray);
     border: 1px solid var(--lightgray);
     border-radius: 0.5rem;
     padding: 1.1rem 1.2rem 1.25rem;
     box-shadow: 0 8px 28px rgba(0,0,0,0.18);
+  }
+  .tftb-suggest-modal .EasyMDEContainer {
+    margin-top: 0.15rem;
+  }
+  .tftb-suggest-modal .EasyMDEContainer .CodeMirror {
+    border-color: var(--lightgray);
+    border-radius: 0 0 0.3rem 0.3rem;
+    background: var(--light);
+    color: var(--darkgray);
+    min-height: 180px;
+  }
+  .tftb-suggest-modal .editor-toolbar {
+    border-color: var(--lightgray);
+    border-radius: 0.3rem 0.3rem 0 0;
+    background: var(--light);
+    opacity: 1;
+  }
+  .tftb-suggest-modal .editor-toolbar button {
+    color: var(--darkgray) !important;
+  }
+  .tftb-suggest-modal .editor-toolbar button:hover,
+  .tftb-suggest-modal .editor-toolbar button.active {
+    background: var(--lightgray) !important;
+    border-color: transparent !important;
+  }
+  .tftb-suggest-modal .editor-preview {
+    background: var(--light);
+    color: var(--darkgray);
   }
   .tftb-suggest-modal h2 {
     margin: 0 0 0.35rem;
@@ -361,9 +389,48 @@ export default (() => {
   }
 
   var backdrop = null;
+  var easyMde = null;
+  var easyMdeLoading = null;
+
+  function ensureEasyMde() {
+    if (window.EasyMDE) return Promise.resolve();
+    if (easyMdeLoading) return easyMdeLoading;
+    easyMdeLoading = new Promise(function (resolve, reject) {
+      if (!document.querySelector("link[data-tftb-easymde]")) {
+        var link = document.createElement("link");
+        link.rel = "stylesheet";
+        link.href = "https://cdn.jsdelivr.net/npm/easymde@2.18.0/dist/easymde.min.css";
+        link.setAttribute("data-tftb-easymde", "1");
+        document.head.appendChild(link);
+      }
+      var s = document.createElement("script");
+      s.src = "https://cdn.jsdelivr.net/npm/easymde@2.18.0/dist/easymde.min.js";
+      s.async = true;
+      s.onload = function () { resolve(); };
+      s.onerror = function () { easyMdeLoading = null; reject(new Error("easymde")); };
+      document.head.appendChild(s);
+    });
+    return easyMdeLoading;
+  }
+
+  function destroyEasyMde() {
+    if (!easyMde) return;
+    try { easyMde.toTextArea(); } catch (e) {}
+    easyMde = null;
+  }
+
   function closeModal() {
+    destroyEasyMde();
     if (backdrop) backdrop.remove();
     backdrop = null;
+  }
+
+  function readMessage(modal) {
+    if (easyMde) {
+      try { return (easyMde.value() || "").trim(); } catch (e) {}
+    }
+    var el = modal.querySelector("#tftb-message");
+    return ((el && el.value) || "").trim();
   }
 
   function openModal(opts) {
@@ -375,6 +442,9 @@ export default (() => {
     var hasQuote = quote.length > 0;
     // file path for vault-ish display (no leading slash)
     var defaultFile = meta.page === "index" ? "index.md" : meta.page + ".md";
+    var placeholder = hasQuote
+      ? "Edit the quoted markdown and/or add a short comment…"
+      : "Write markdown for the change, notes about this file, or a draft for a new note…";
 
     backdrop = document.createElement("div");
     backdrop.className = "tftb-suggest-backdrop";
@@ -408,13 +478,11 @@ export default (() => {
       quoteWrap.hidden = false;
       quoteWrap.querySelector(".quote").textContent = quote;
       message.value = quote;
-      message.placeholder = "Edit the quoted markdown and/or add a short comment…";
     } else {
       quoteWrap.hidden = true;
       message.value = "";
-      message.placeholder =
-        "Write markdown for the change, notes about this file, or a draft for a new note…";
     }
+    message.placeholder = placeholder;
 
     backdrop.addEventListener("click", function (e) {
       if (e.target === backdrop) closeModal();
@@ -424,10 +492,38 @@ export default (() => {
       submitSuggestion(meta, quote, modal);
     });
     document.body.appendChild(backdrop);
-    message.focus();
-    if (hasQuote) {
-      try { message.setSelectionRange(message.value.length, message.value.length); } catch (e) {}
-    }
+
+    ensureEasyMde().then(function () {
+      if (!backdrop || !document.body.contains(message)) return;
+      destroyEasyMde();
+      easyMde = new window.EasyMDE({
+        element: message,
+        initialValue: message.value || "",
+        placeholder: placeholder,
+        spellChecker: false,
+        status: false,
+        autofocus: true,
+        minHeight: "180px",
+        renderingConfig: { singleLineBreaks: false },
+        toolbar: [
+          "bold",
+          "italic",
+          "heading",
+          "|",
+          "quote",
+          "unordered-list",
+          "ordered-list",
+          "|",
+          "link",
+          "|",
+          "preview",
+          "side-by-side",
+          "guide",
+        ],
+      });
+    }).catch(function () {
+      message.focus();
+    });
   }
 
   async function submitSuggestion(meta, quote, modal) {
@@ -437,7 +533,7 @@ export default (() => {
     msg.hidden = true;
 
     var file = (modal.querySelector("#tftb-file").value || "").trim().replace(/^\\/+/, "");
-    var message = (modal.querySelector("#tftb-message").value || "").trim();
+    var message = readMessage(modal);
     if (!file) {
       msg.hidden = false;
       msg.className = "tftb-suggest-msg err";
