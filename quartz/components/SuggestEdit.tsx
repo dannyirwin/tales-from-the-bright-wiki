@@ -272,9 +272,11 @@ export default (() => {
     background: var(--light);
     color: var(--darkgray);
   }
-  .tftb-suggest-modal input[readonly] {
-    opacity: 0.85;
-    background: color-mix(in srgb, var(--lightgray) 25%, var(--light));
+  .tftb-suggest-modal .tftb-note-display {
+    margin: 0;
+    font-size: 0.95rem;
+    color: var(--darkgray);
+    line-height: 1.4;
   }
   .tftb-suggest-actions {
     display: flex;
@@ -782,8 +784,9 @@ export default (() => {
       '<div class="tftb-suggest-modal" role="dialog" aria-modal="true">' +
       "<h2></h2>" +
       '<p class="meta"></p>' +
-      '<label for="tftb-file"></label>' +
-      '<input id="tftb-file" type="text" spellcheck="false" />' +
+      '<label for="tftb-file">Note name</label>' +
+      '<input id="tftb-file" type="text" spellcheck="false" hidden />' +
+      '<p id="tftb-note-display" class="tftb-note-display" hidden></p>' +
       '<label for="tftb-message">Message</label>' +
       '<textarea id="tftb-message" spellcheck="true" hidden></textarea>' +
       '<div id="tftb-md-editor" class="tftb-md-editor"></div>' +
@@ -798,22 +801,28 @@ export default (() => {
     modal.setAttribute("aria-label", copy.title);
     modal.querySelector("h2").textContent = copy.title;
     modal.querySelector(".meta").textContent = copy.meta;
-    var fileLabel = modal.querySelector('label[for="tftb-file"]');
     var fileInput = modal.querySelector("#tftb-file");
+    var noteDisplay = modal.querySelector("#tftb-note-display");
     var message = modal.querySelector("#tftb-message");
     var msgEl = modal.querySelector(".tftb-suggest-msg");
 
+    function setNotePath(filePath) {
+      var path = String(filePath || "").replace(/^\\/+/, "");
+      fileInput.value = path;
+      noteDisplay.textContent = path.replace(/\\.md$/i, "") || "…";
+    }
+
     if (mode === "new") {
-      fileLabel.textContent = "Note name";
-      fileInput.readOnly = false;
+      fileInput.hidden = false;
+      noteDisplay.hidden = true;
       fileInput.value = "";
       fileInput.placeholder = "e.g. New Place";
       message.value = "";
     } else {
-      fileLabel.textContent = "File";
-      fileInput.readOnly = true;
-      fileInput.value = "";
-      fileInput.placeholder = "Resolving file…";
+      fileInput.hidden = true;
+      noteDisplay.hidden = false;
+      setNotePath("");
+      noteDisplay.textContent = "Resolving note…";
       message.value = mode === "quote" ? quote : "";
     }
     message.placeholder = copy.placeholder;
@@ -860,11 +869,10 @@ export default (() => {
 
     msgEl.hidden = false;
     msgEl.className = "tftb-suggest-msg";
-    msgEl.textContent = mode === "page" ? "Loading page markdown…" : "Resolving file…";
+    msgEl.textContent = mode === "page" ? "Loading note…" : "Resolving note…";
 
     resolveFilePath(meta).then(function (filePath) {
-      fileInput.value = filePath;
-      fileInput.placeholder = filePath;
+      setNotePath(filePath);
       if (mode !== "page") {
         msgEl.hidden = true;
         bootEditor(message.value);
@@ -878,14 +886,13 @@ export default (() => {
         bootEditor(parts.body);
       });
     }).catch(function () {
-      fileInput.value = fallbackFilePath(meta);
-      fileInput.placeholder = fileInput.value;
+      setNotePath(fallbackFilePath(meta));
       original = "";
       preservedFm = "";
       modal.setAttribute("data-tftb-fm", "");
       msgEl.hidden = false;
       msgEl.className = "tftb-suggest-msg err";
-      msgEl.textContent = "Couldn’t load the file — you can still write a message.";
+      msgEl.textContent = "Couldn’t load the note — you can still write a message.";
       bootEditor(mode === "quote" ? quote : "");
     });
   }
@@ -917,7 +924,7 @@ export default (() => {
     var file = (modal.querySelector("#tftb-file").value || "").trim().replace(/^\\/+/, "");
     var message = readMessage(modal);
     if (!file) {
-      showStatus("err", mode === "new" ? "Add a note name." : "Add a file path.");
+      showStatus("err", "Add a note name.");
       return;
     }
     if (!/\\.md$/i.test(file)) file = file + ".md";
