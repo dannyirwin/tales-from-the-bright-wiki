@@ -2,6 +2,7 @@ import { loadQuartzConfig, loadQuartzLayout } from "./quartz/plugins/loader/conf
 import { PageTypes } from "./quartz/plugins"
 import PageTitle from "./quartz/components/PageTitle"
 import SiteMeta from "./quartz/components/SiteMeta"
+import SuggestEdit from "./quartz/components/SuggestEdit"
 import OutgoingLinks from "./quartz/components/OutgoingLinks"
 import { QuartzComponent } from "./quartz/components/types"
 
@@ -33,7 +34,11 @@ function withOutgoingLinks(components: QuartzComponent[] | undefined): QuartzCom
   if (tocIdx >= 0) {
     right.splice(tocIdx + 1, 0, outgoingLinks)
   } else {
-    const backIdx = right.findIndex((c) => (c.displayName ?? "").includes("Backlink") || (typeof c.css === "string" && c.css.includes(".backlinks")))
+    const backIdx = right.findIndex(
+      (c) =>
+        (c.displayName ?? "").includes("Backlink") ||
+        (typeof c.css === "string" && c.css.includes(".backlinks")),
+    )
     if (backIdx >= 0) right.splice(backIdx, 0, outgoingLinks)
     else right.push(outgoingLinks)
   }
@@ -47,8 +52,9 @@ for (const pageType of Object.values(layout.byPageType)) {
   pageType.right = withOutgoingLinks(pageType.right)
 }
 
+const suggestEdit = SuggestEdit()
 const siteMeta = SiteMeta()
-const footer = [...(layout.defaults.footer ?? []), siteMeta]
+const footer = [...(layout.defaults.footer ?? []), suggestEdit, siteMeta]
 layout.defaults.footer = footer
 for (const pageType of Object.values(layout.byPageType)) {
   pageType.footer = footer

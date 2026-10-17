@@ -1,0 +1,109 @@
+# Decap CMS — player wiki editor
+# Auth goes through a Cloudflare Worker OAuth proxy (see admin/README.md).
+#
+# PLACEHOLDER: replace base_url with your deployed Worker URL after OAuth setup.
+# Example: https://tftb-decap-oauth.dannyirwin.workers.dev
+
+backend:
+  name: github
+  repo: dannyirwin/tales-from-the-bright-wiki
+  branch: v5
+  base_url: https://tftb-decap-oauth.dannyirwin.workers.dev # PLACEHOLDER — set after Worker deploy
+  auth_endpoint: auth
+
+publish_mode: editorial_workflow
+
+site_url: https://dannyirwin.github.io/tales-from-the-bright-wiki
+display_url: https://dannyirwin.github.io/tales-from-the-bright-wiki
+logo_url: https://dannyirwin.github.io/tales-from-the-bright-wiki
+
+# Media uploads (v1). Files land in the repo under content/media/.
+# public_folder must include the GitHub project Pages base path.
+media_folder: content/media
+public_folder: /tales-from-the-bright-wiki/media
+
+# Shared fields: body is primary. Title optional (many vault notes use the filename).
+# aliases / tags / publish are optional so they are preserved on save and not required to edit.
+.shared_fields: &shared_fields
+  - label: Title
+    name: title
+    widget: string
+    required: false
+    hint: Optional. Existing notes usually omit this and use the filename instead.
+  - label: Body
+    name: body
+    widget: markdown
+  - label: Aliases
+    name: aliases
+    widget: list
+    required: false
+    collapsed: true
+    hint: Optional. Leave alone unless you know you need a redirect alias.
+  - label: Tags
+    name: tags
+    widget: list
+    required: false
+    collapsed: true
+    hint: Optional. Prefer existing taxonomy tags when set.
+  - label: Publish
+    name: publish
+    widget: boolean
+    required: false
+    default: true
+    hint: Optional. Uncheck to keep a draft out of the public site.
+
+collections:
+  - name: locations
+    label: Locations
+    folder: content/Locations
+    create: true
+    extension: md
+    format: frontmatter
+    slug: "{{slug}}"
+    fields: *shared_fields
+
+  - name: lore
+    label: Lore
+    folder: content/Lore
+    create: true
+    extension: md
+    format: frontmatter
+    slug: "{{slug}}"
+    fields: *shared_fields
+
+  - name: events
+    label: Events
+    folder: content/Events
+    create: true
+    extension: md
+    format: frontmatter
+    slug: "{{slug}}"
+    fields: *shared_fields
+
+  - name: factions
+    label: Factions
+    folder: content/Factions
+    create: true
+    extension: md
+    format: frontmatter
+    slug: "{{slug}}"
+    fields: *shared_fields
+
+  - name: people_gods
+    label: People / Gods
+    label_singular: God
+    folder: content/People/Gods
+    create: true
+    extension: md
+    format: frontmatter
+    slug: "{{slug}}"
+    fields: *shared_fields
+
+
+  - name: pages
+    label: Site pages
+    files:
+      - label: Home
+        name: index
+        file: content/index.md
+        fields: *shared_fields

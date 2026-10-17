@@ -56,6 +56,11 @@ jobs:
       - name: Build Quartz
         run: npx quartz build
 
+      - name: Copy Decap admin into site
+        run: |
+          mkdir -p public/admin
+          cp -R admin/. public/admin/
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
