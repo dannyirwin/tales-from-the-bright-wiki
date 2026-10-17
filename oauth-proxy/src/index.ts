@@ -180,13 +180,13 @@ function loginHtml(returnUrl: string): string {
     "Sign in — Tales from the Bright",
     `
   <h1>Sign in</h1>
-  <p class="meta">Use your character name and the password Danny gave you.</p>
+  <p class="meta">Enter your name, and your character name as the password.</p>
   <form id="f">
     <input type="hidden" name="returnUrl" value="${ret}" />
-    <label for="player">Character name</label>
-    <input id="player" name="player" required autocomplete="username" autofocus />
-    <label for="password">Password</label>
-    <input id="password" name="password" type="password" required autocomplete="current-password" />
+    <label for="player">Your name</label>
+    <input id="player" name="player" required autocomplete="username" autofocus placeholder="e.g. Danny" />
+    <label for="password">Character name</label>
+    <input id="password" name="password" type="text" required autocomplete="off" placeholder="your character’s name" />
     <button type="submit">Enter the wiki</button>
     <p id="msg" class="err" hidden></p>
   </form>
@@ -404,7 +404,7 @@ export default {
       }
       const name = verifyPlayer(env, data.player || "", data.password || "")
       if (!name) {
-        return Response.json({ error: "Wrong name or password" }, { status: 401, headers })
+        return Response.json({ error: "Wrong name or character name" }, { status: 401, headers })
       }
       const { token, exp } = await signToken(env, name)
       return Response.json({ ok: true, token, name, exp }, { headers })
