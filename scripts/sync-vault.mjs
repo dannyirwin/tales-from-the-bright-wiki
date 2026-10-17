@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
- * Sync the full Obsidian vault into content/.
- * Quartz ExplicitPublish still hides unpublished notes from the live wiki
- * (only notes with `publish: true` are built).
+ * Sync published Obsidian notes into content/.
+ * Only markdown with `publish: true` (quoted or unquoted) is copied,
+ * so collaborators/CMS never see DM-only notes.
  */
 import fs from "node:fs"
 import path from "node:path"
@@ -15,7 +15,14 @@ const VAULT_DIR =
   process.env.VAULT_DIR ||
   path.resolve(WIKI_ROOT, "..", "Tales From the Bright")
 
-const SKIP_DIRS = new Set([".git", ".obsidian", "node_modules", ".trash"])
+const SKIP_DIRS = new Set([
+  ".git",
+  ".obsidian",
+  ".cursor",
+  "Excalidraw",
+  "node_modules",
+  ".trash",
+])
 const SKIP_NAMES = new Set([".DS_Store"])
 
 function shouldSkip(name) {
@@ -32,17 +39,39 @@ function emptyContent() {
   }
 }
 
-function copyTree(srcDir, destDir) {
-  fs.mkdirSync(destDir, { recursive: true })
+/** Keep content/media/ in git after emptyContent() wipes content/. */
+function ensureMediaGitkeep() {
+  const mediaDir = path.join(CONTENT_DIR, "media")
+  fs.mkdirSync(mediaDir, { recursive: true })
+  fs.writeFileSync(path.join(mediaDir, ".gitkeep"), "")
+}
+
+/** True when frontmatter has publish: true or publish: "true". */
+function hasPublishTrue(filePath) {
+  const text = fs.readFileSync(filePath, "utf8")
+  if (!text.startsWith("---")) return false
+  const end = text.indexOf("\n---", 3)
+  const frontmatter = end === -1 ? text : text.slice(0, end + 1)
+  return /^publish:\s*"?true"?\s*$/m.test(frontmatter)
+}
+
+/**
+ * Copy only .md files with publish: true. Directories are created as needed.
+ * Skips *.base and all other non-markdown assets (v1).
+ */
+function copyPublished(srcDir, destDir) {
   let count = 0
   for (const entry of fs.readdirSync(srcDir, { withFileTypes: true })) {
     if (shouldSkip(entry.name)) continue
     const src = path.join(srcDir, entry.name)
-    const dest = path.join(destDir, entry.name)
     if (entry.isDirectory()) {
-      count += copyTree(src, dest)
+      count += copyPublished(src, path.join(destDir, entry.name))
     } else if (entry.isFile()) {
-      fs.copyFileSync(src, dest)
+      if (entry.name.endsWith(".base")) continue
+      if (!entry.name.endsWith(".md")) continue
+      if (!hasPublishTrue(src)) continue
+      fs.mkdirSync(destDir, { recursive: true })
+      fs.copyFileSync(src, path.join(destDir, entry.name))
       count++
     }
   }
@@ -75,11 +104,12 @@ function main() {
   }
 
   emptyContent()
-  const copied = copyTree(VAULT_DIR, CONTENT_DIR)
+  ensureMediaGitkeep()
+  const copied = copyPublished(VAULT_DIR, CONTENT_DIR)
   ensureIndexPublish()
 
-  console.log(`Synced ${copied} file(s) from vault → content/`)
-  console.log("Wiki build still only includes notes with publish: true")
+  console.log(`Synced ${copied} published note(s) from vault → content/`)
+  console.log("Only notes with publish: true were copied")
   console.log("Next: npx quartz build --serve")
 }
 
