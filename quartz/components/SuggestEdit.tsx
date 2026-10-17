@@ -753,7 +753,7 @@ export default (() => {
     if (mode === "new") {
       return {
         title: "Suggest a new note",
-        meta: "Pick a file path for the new note, then write the draft (or a short description) below.",
+        meta: "Name the note, then write the draft (or a short description) below.",
         placeholder: "Draft the new note…",
       };
     }
@@ -782,7 +782,7 @@ export default (() => {
       '<div class="tftb-suggest-modal" role="dialog" aria-modal="true">' +
       "<h2></h2>" +
       '<p class="meta"></p>' +
-      '<label for="tftb-file">File</label>' +
+      '<label for="tftb-file"></label>' +
       '<input id="tftb-file" type="text" spellcheck="false" />' +
       '<label for="tftb-message">Message</label>' +
       '<textarea id="tftb-message" spellcheck="true" hidden></textarea>' +
@@ -798,16 +798,19 @@ export default (() => {
     modal.setAttribute("aria-label", copy.title);
     modal.querySelector("h2").textContent = copy.title;
     modal.querySelector(".meta").textContent = copy.meta;
+    var fileLabel = modal.querySelector('label[for="tftb-file"]');
     var fileInput = modal.querySelector("#tftb-file");
     var message = modal.querySelector("#tftb-message");
     var msgEl = modal.querySelector(".tftb-suggest-msg");
 
     if (mode === "new") {
+      fileLabel.textContent = "Note name";
       fileInput.readOnly = false;
       fileInput.value = "";
-      fileInput.placeholder = "e.g. Locations/New Place.md";
+      fileInput.placeholder = "e.g. New Place";
       message.value = "";
     } else {
+      fileLabel.textContent = "File";
       fileInput.readOnly = true;
       fileInput.value = "";
       fileInput.placeholder = "Resolving file…";
@@ -914,7 +917,7 @@ export default (() => {
     var file = (modal.querySelector("#tftb-file").value || "").trim().replace(/^\\/+/, "");
     var message = readMessage(modal);
     if (!file) {
-      showStatus("err", "Add a file path.");
+      showStatus("err", mode === "new" ? "Add a note name." : "Add a file path.");
       return;
     }
     if (!/\\.md$/i.test(file)) file = file + ".md";
