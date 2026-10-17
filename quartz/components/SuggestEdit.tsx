@@ -11,11 +11,17 @@ export default (() => {
   SuggestEdit.displayName = "SuggestEdit"
 
   SuggestEdit.css = `
-  .tftb-suggest-global {
+  .tftb-toolbar {
     position: fixed;
     top: 0.85rem;
     right: 0.85rem;
     z-index: 10050;
+    display: flex;
+    gap: 0.4rem;
+    align-items: center;
+  }
+  .tftb-suggest-global,
+  .tftb-logout {
     width: 2.25rem;
     height: 2.25rem;
     border-radius: 999px;
@@ -29,7 +35,15 @@ export default (() => {
     box-shadow: 0 1px 4px rgba(0,0,0,0.08);
     padding: 0;
   }
-  .tftb-suggest-global:hover {
+  .tftb-logout {
+    width: auto;
+    padding: 0 0.7rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .tftb-suggest-global:hover,
+  .tftb-logout:hover {
     color: var(--secondary);
     border-color: var(--secondary);
   }
@@ -185,8 +199,16 @@ export default (() => {
     return { page: path, title: title, url: location.href.split("#")[0] };
   }
 
-  function ensureGlobalBtn() {
-    if (document.querySelector(".tftb-suggest-global")) return;
+  function logout() {
+    localStorage.removeItem(KEY);
+    location.href = WORKER + "/login?return=" + encodeURIComponent(location.href.split("#")[0]);
+  }
+
+  function ensureToolbar() {
+    if (document.querySelector(".tftb-toolbar")) return;
+    var bar = document.createElement("div");
+    bar.className = "tftb-toolbar";
+
     var btn = document.createElement("button");
     btn.type = "button";
     btn.className = "tftb-suggest-global";
@@ -198,7 +220,22 @@ export default (() => {
       e.stopPropagation();
       openModal({ mode: "global" });
     });
-    document.body.appendChild(btn);
+
+    var out = document.createElement("button");
+    out.type = "button";
+    out.className = "tftb-logout";
+    out.textContent = "Log out";
+    out.title = "Log out";
+    out.setAttribute("aria-label", "Log out");
+    out.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      logout();
+    });
+
+    bar.appendChild(btn);
+    bar.appendChild(out);
+    document.body.appendChild(bar);
   }
 
   var floatBtn = null;
@@ -459,7 +496,7 @@ export default (() => {
     }
   }
 
-  ensureGlobalBtn();
+  ensureToolbar();
   document.addEventListener("mouseup", function () {
     setTimeout(onSelectionChange, 10);
   });
@@ -481,7 +518,7 @@ export default (() => {
   document.addEventListener("nav", function () {
     hideFloat();
     closeModal();
-    ensureGlobalBtn();
+    ensureToolbar();
   });
 })();
 `
