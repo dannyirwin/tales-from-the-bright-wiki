@@ -56,12 +56,12 @@ for (const pageType of Object.values(layout.byPageType)) {
 const authGate = AuthGate()
 const suggestEdit = SuggestEdit()
 const siteMeta = SiteMeta()
-const footer = [...(layout.defaults.footer ?? []), suggestEdit, siteMeta]
+const footer = [...(layout.defaults.footer ?? []), siteMeta]
 layout.defaults.footer = footer
-layout.defaults.beforeBody = [authGate, ...(layout.defaults.beforeBody ?? [])]
+layout.defaults.beforeBody = [authGate, suggestEdit, ...(layout.defaults.beforeBody ?? [])]
 for (const pageType of Object.values(layout.byPageType)) {
   pageType.footer = footer
-  pageType.beforeBody = [authGate, ...(pageType.beforeBody ?? [])]
+  pageType.beforeBody = [authGate, suggestEdit, ...(pageType.beforeBody ?? [])]
 }
 
 config.plugins.emitters = config.plugins.emitters.filter((e) => e.name !== "PageTypeDispatcher")
