@@ -1,5 +1,5 @@
 import { QuartzComponent, QuartzComponentConstructor } from "./types"
-import { TFTB_AUTH_WORKER } from "./tftbAuth"
+import { TFTB_AUTH_WORKER, TFTB_LOGIN_HELPER_JS } from "./tftbAuth"
 
 /**
  * Three suggest modes (same dialog):
@@ -328,6 +328,7 @@ export default (() => {
   var BASE = "/tales-from-the-bright-wiki";
   var RAW =
     "https://raw.githubusercontent.com/dannyirwin/tales-from-the-bright-wiki/v5/content/";
+  ${TFTB_LOGIN_HELPER_JS}
 
   function session() {
     try { return JSON.parse(localStorage.getItem(KEY) || "null"); } catch (e) { return null; }
@@ -337,7 +338,7 @@ export default (() => {
     var s = session();
     if (!s || !s.token || (s.exp && s.exp * 1000 < Date.now())) {
       localStorage.removeItem(KEY);
-      location.href = WORKER + "/login?return=" + encodeURIComponent(location.href.split("#")[0]);
+      location.href = tftbLoginUrl(location.href);
       return null;
     }
     return s;
@@ -417,7 +418,7 @@ export default (() => {
 
   function logout() {
     localStorage.removeItem(KEY);
-    location.href = WORKER + "/login?return=" + encodeURIComponent(location.href.split("#")[0]);
+    location.href = tftbLoginUrl(location.href);
   }
 
   function ensureToolbar() {
@@ -966,7 +967,7 @@ export default (() => {
       var json = await res.json().catch(function () { return {}; });
       if (res.status === 401) {
         localStorage.removeItem(KEY);
-        location.href = WORKER + "/login?return=" + encodeURIComponent(location.href);
+        location.href = tftbLoginUrl(location.href);
         return;
       }
       if (!res.ok) {

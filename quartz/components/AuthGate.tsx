@@ -1,5 +1,5 @@
 import { QuartzComponent, QuartzComponentConstructor } from "./types"
-import { TFTB_AUTH_WORKER, TFTB_SESSION_KEY } from "./tftbAuth"
+import { TFTB_LOGIN_HELPER_JS, TFTB_SESSION_KEY } from "./tftbAuth"
 
 export default (() => {
   const AuthGate: QuartzComponent = () => null
@@ -18,8 +18,8 @@ html.tftb-auth-pending body {
 
   AuthGate.afterDOMLoaded = `
 (function () {
-  var WORKER = ${JSON.stringify(TFTB_AUTH_WORKER)};
   var KEY = ${JSON.stringify(TFTB_SESSION_KEY)};
+  ${TFTB_LOGIN_HELPER_JS}
 
   function clearPending() {
     document.documentElement.classList.remove("tftb-auth-pending");
@@ -59,8 +59,7 @@ html.tftb-auth-pending body {
   var session = readSession();
   if (!session || !session.token || (session.exp && session.exp * 1000 < Date.now())) {
     localStorage.removeItem(KEY);
-    var ret = encodeURIComponent(location.href.split("#")[0]);
-    location.href = WORKER + "/login?return=" + ret;
+    location.href = tftbLoginUrl(location.href);
     return;
   }
 

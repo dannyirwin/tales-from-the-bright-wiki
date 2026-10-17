@@ -147,19 +147,20 @@ function escapeHtml(s: string): string {
     .replace(/"/g, "&quot;")
 }
 
-function pageShell(title: string, body: string): string {
+function pageShell(title: string, body: string, theme: "light" | "dark" = "light"): string {
+  const savedTheme = theme === "dark" ? "dark" : "light"
   return `<!DOCTYPE html>
-<html lang="en">
+<html lang="en" saved-theme="${savedTheme}">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light dark" />
   <title>${escapeHtml(title)}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;700&family=Source+Sans+Pro:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet" />
   <style>
-    :root {
-      color-scheme: light dark;
+    :root, [saved-theme="light"] {
       --light: #faf8f8;
       --lightgray: #e5e5e5;
       --gray: #b8b8b8;
@@ -171,8 +172,18 @@ function pageShell(title: string, body: string): string {
       --titleFont: "Schibsted Grotesk", system-ui, sans-serif;
       --bodyFont: "Source Sans Pro", system-ui, sans-serif;
     }
+    [saved-theme="dark"] {
+      --light: #161618;
+      --lightgray: #393639;
+      --gray: #646464;
+      --darkgray: #d4d4d4;
+      --dark: #ebebec;
+      --secondary: #7b97aa;
+      --tertiary: #84a59d;
+      --highlight: rgba(143, 159, 169, 0.15);
+    }
     @media (prefers-color-scheme: dark) {
-      :root {
+      :root:not([saved-theme="light"]):not([saved-theme="dark"]) {
         --light: #161618;
         --lightgray: #393639;
         --gray: #646464;
@@ -189,22 +200,21 @@ function pageShell(title: string, body: string): string {
       font-size: 1rem;
       line-height: 1.55;
       color: var(--darkgray);
-      background:
-        radial-gradient(ellipse 80% 50% at 50% -10%, color-mix(in srgb, var(--secondary) 18%, transparent), transparent),
-        var(--light);
+      background: var(--light);
       display: flex;
       align-items: flex-start;
       justify-content: center;
-      padding: 10vh 1rem 3rem;
+      padding: 8vh 1rem 2rem;
     }
+    /* Match wiki suggest modal chrome */
     .shell {
       width: min(26rem, 100%);
       background: var(--light);
       color: var(--darkgray);
       border: 1px solid var(--lightgray);
       border-radius: 0.5rem;
-      padding: 1.35rem 1.4rem 1.5rem;
-      box-shadow: 0 8px 28px rgba(0,0,0,0.12);
+      padding: 1.1rem 1.2rem 1.25rem;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.18);
     }
     .brand {
       margin: 0 0 0.85rem;
@@ -223,52 +233,64 @@ function pageShell(title: string, body: string): string {
     }
     .meta {
       color: var(--gray);
-      font-size: 0.9rem;
-      margin: 0 0 1.1rem;
+      font-size: 0.85rem;
+      margin: 0 0 0.85rem;
     }
     label {
       display: block;
       font-weight: 600;
       font-size: 0.85rem;
-      margin: 0.75rem 0 0.3rem;
+      margin: 0.7rem 0 0.25rem;
       color: var(--darkgray);
     }
     input, textarea {
       width: 100%;
       font: inherit;
-      padding: 0.5rem 0.65rem;
+      padding: 0.45rem 0.5rem;
       border: 1px solid var(--lightgray);
-      border-radius: 0.35rem;
+      border-radius: 0.3rem;
       background: var(--light);
       color: var(--darkgray);
     }
     input:focus, textarea:focus {
       outline: none;
       border-color: var(--secondary);
-      box-shadow: 0 0 0 2px color-mix(in srgb, var(--secondary) 25%, transparent);
     }
     textarea { min-height: 10rem; resize: vertical; }
-    button {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      margin-top: 1.15rem;
-      height: 2.35rem;
-      padding: 0 1.1rem;
+    .actions {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: flex-end;
+      margin-top: 1rem;
+    }
+    .actions button,
+    button.primary {
       font: inherit;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       font-weight: 600;
+      padding: 0.4rem 0.9rem;
+      height: 2.25rem;
       border-radius: 999px;
+      cursor: pointer;
       border: 1px solid var(--secondary);
       background: var(--secondary);
       color: var(--light);
-      cursor: pointer;
     }
-    button:hover { filter: brightness(1.06); }
-    button:disabled { opacity: 0.55; cursor: default; pointer-events: none; filter: none; }
-    .err { color: #b00020; margin-top: 0.85rem; font-size: 0.9rem; }
-    .ok { color: #0a7; margin-top: 0.85rem; font-size: 0.9rem; }
-    .pending { color: var(--gray); margin-top: 0.85rem; font-size: 0.9rem; }
+    .actions button:hover,
+    button.primary:hover {
+      color: var(--light);
+      filter: brightness(1.05);
+    }
+    .actions button:disabled,
+    button.primary:disabled {
+      opacity: 0.55;
+      cursor: default;
+      pointer-events: none;
+      filter: none;
+    }
+    .err { color: #b00020; margin-top: 0.65rem; font-size: 0.9rem; }
+    .ok { color: #0a7; margin-top: 0.65rem; font-size: 0.9rem; }
+    .pending { color: var(--gray); margin-top: 0.65rem; font-size: 0.9rem; }
     .quote {
       border-left: 3px solid var(--secondary);
       padding-left: 0.75rem;
@@ -288,7 +310,7 @@ ${body}
 </html>`
 }
 
-function loginHtml(returnUrl: string): string {
+function loginHtml(returnUrl: string, theme: "light" | "dark" = "light"): string {
   const ret = escapeHtml(returnUrl)
   return pageShell(
     "Sign in — Tales From the Bright",
@@ -302,7 +324,9 @@ function loginHtml(returnUrl: string): string {
     <input id="player" name="player" required autocomplete="username" autofocus placeholder="e.g. Danny" />
     <label for="password">Your previous character’s name</label>
     <input id="password" name="password" type="text" required autocomplete="off" placeholder="e.g. Sir Martin" />
-    <button type="submit">Enter the wiki</button>
+    <div class="actions">
+      <button type="submit" class="primary">Enter the wiki</button>
+    </div>
     <p id="msg" class="err" hidden></p>
   </form>
   <script>
@@ -348,15 +372,19 @@ function loginHtml(returnUrl: string): string {
       }
     });
   </script>`,
+    theme,
   )
 }
 
-function suggestHtml(prefill: {
-  page: string
-  title: string
-  url: string
-  quote: string
-}): string {
+function suggestHtml(
+  prefill: {
+    page: string
+    title: string
+    url: string
+    quote: string
+  },
+  theme: "light" | "dark" = "light",
+): string {
   const page = escapeHtml(prefill.page)
   const title = escapeHtml(prefill.title)
   const url = escapeHtml(prefill.url)
@@ -390,7 +418,9 @@ function suggestHtml(prefill: {
     <input id="subject" name="subject" required value="${defaultSubject}" />
     <label for="body">What should change?</label>
     <textarea id="body" name="body" required placeholder="Describe the edit, or paste corrected text…"></textarea>
-    <button type="submit">Send suggestion</button>
+    <div class="actions">
+      <button type="submit" class="primary">Send suggestion</button>
+    </div>
     <p id="msg" hidden></p>
   </form>
   <script>
@@ -460,6 +490,7 @@ function suggestHtml(prefill: {
       }
     });
   </script>`,
+    theme,
   )
 }
 
@@ -604,7 +635,8 @@ export default {
 
     if (url.pathname === "/login") {
       const ret = url.searchParams.get("return") || wikiBase(env)
-      return new Response(loginHtml(ret), {
+      const theme = url.searchParams.get("theme") === "dark" ? "dark" : "light"
+      return new Response(loginHtml(ret, theme), {
         headers: { "Content-Type": "text/html; charset=utf-8" },
       })
     }
@@ -614,8 +646,9 @@ export default {
       const title = url.searchParams.get("title") || ""
       let pageUrl = url.searchParams.get("url") || ""
       const quote = url.searchParams.get("quote") || ""
+      const theme = url.searchParams.get("theme") === "dark" ? "dark" : "light"
       if (!pageUrl && page) pageUrl = `${wikiBase(env)}/${page.replace(/^\//, "")}`
-      return new Response(suggestHtml({ page, title, url: pageUrl, quote }), {
+      return new Response(suggestHtml({ page, title, url: pageUrl, quote }, theme), {
         headers: { "Content-Type": "text/html; charset=utf-8" },
       })
     }
