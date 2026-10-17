@@ -59,18 +59,30 @@ export default (() => {
     position: absolute;
     z-index: 10040;
     transform: translate(-50%, -120%);
-    border: 1px solid var(--lightgray);
-    background: var(--light);
-    color: var(--darkgray);
-    border-radius: 0.4rem;
-    padding: 0.35rem 0.65rem;
-    font-size: 0.8rem;
+    width: 2.25rem;
+    height: 2.25rem;
+    padding: 0;
+    border: 1px solid var(--dark);
+    border-radius: 999px;
+    background: var(--dark);
+    color: var(--light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-    white-space: nowrap;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.22);
   }
   .tftb-suggest-float:hover {
-    color: var(--secondary);
+    filter: brightness(1.12);
+  }
+  .tftb-suggest-float svg {
+    width: 1.05rem;
+    height: 1.05rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.75;
+    stroke-linecap: round;
+    stroke-linejoin: round;
   }
   .tftb-suggest-backdrop {
     position: fixed;
@@ -501,8 +513,9 @@ export default (() => {
     floatBtn = document.createElement("button");
     floatBtn.type = "button";
     floatBtn.className = "tftb-suggest-float";
-    floatBtn.textContent = "Suggest edit";
+    floatBtn.setAttribute("aria-label", "Suggest edit");
     floatBtn.title = "Edit this highlighted text";
+    floatBtn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
     floatBtn.style.left = (rect.left + rect.width / 2 + window.scrollX) + "px";
     floatBtn.style.top = (rect.top + window.scrollY) + "px";
     floatBtn.addEventListener("mousedown", function (e) { e.preventDefault(); });
