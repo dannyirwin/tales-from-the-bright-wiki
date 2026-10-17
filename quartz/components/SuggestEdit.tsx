@@ -190,8 +190,8 @@ export default (() => {
     var btn = document.createElement("button");
     btn.type = "button";
     btn.className = "tftb-suggest-global";
-    btn.setAttribute("aria-label", "Suggest a global edit");
-    btn.title = "Suggest a global edit";
+    btn.setAttribute("aria-label", "Suggest an edit");
+    btn.title = "Suggest an edit (this page or a new file)";
     btn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
     btn.addEventListener("click", function (e) {
       e.preventDefault();
@@ -334,25 +334,25 @@ export default (() => {
     closeModal();
     hideFloat();
     var meta = pageMeta();
-    var mode = opts.mode || "global";
     var quote = (opts.quote || "").trim();
+    var hasQuote = quote.length > 0;
+    // file path for vault-ish display (no leading slash)
+    var defaultFile = meta.page === "index" ? "index.md" : meta.page + ".md";
 
     backdrop = document.createElement("div");
     backdrop.className = "tftb-suggest-backdrop";
     backdrop.innerHTML =
       '<div class="tftb-suggest-modal" role="dialog" aria-modal="true">' +
-      "<h2>" + (mode === "quote" ? "Suggest an edit" : "Suggest a global edit") + "</h2>" +
-      '<p class="meta">On: <strong></strong></p>' +
-      (mode === "quote"
-        ? '<label>Quoted markdown</label><pre class="quote"></pre>' +
-          "<label for=\\"tftb-rewrite\\">Your rewrite (markdown)</label>" +
-          '<textarea id="tftb-rewrite" class="tftb-md" spellcheck="true"></textarea>' +
-          "<label for=\\"tftb-comment\\">Comment (optional)</label>" +
-          '<textarea id="tftb-comment" placeholder="Why this change?"></textarea>'
-        : "<label for=\\"tftb-subject\\">Subject</label>" +
-          '<input id="tftb-subject" />' +
-          "<label for=\\"tftb-body\\">Suggestion (markdown)</label>" +
-          '<textarea id="tftb-body" class="tftb-md" placeholder="Write markdown for the proposed change…"></textarea>') +
+      "<h2>Suggest an edit</h2>" +
+      '<p class="meta">Edit this note, or change the file path to propose a new one.</p>' +
+      '<label for="tftb-file">File</label>' +
+      '<input id="tftb-file" type="text" spellcheck="false" />' +
+      '<div class="tftb-quote-wrap" hidden>' +
+      "<label>Quoted markdown</label>" +
+      '<pre class="quote"></pre>' +
+      "</div>" +
+      '<label for="tftb-message">Message</label>' +
+      '<textarea id="tftb-message" class="tftb-md" spellcheck="true"></textarea>' +
       '<div class="tftb-suggest-actions">' +
       '<button type="button" class="cancel">Cancel</button>' +
       '<button type="button" class="primary submit">Send</button>' +
@@ -361,12 +361,22 @@ export default (() => {
       "</div>";
 
     var modal = backdrop.querySelector(".tftb-suggest-modal");
-    modal.querySelector(".meta strong").textContent = meta.title || meta.page;
-    if (mode === "quote") {
-      modal.querySelector(".quote").textContent = quote;
-      modal.querySelector("#tftb-rewrite").value = quote;
+    var fileInput = modal.querySelector("#tftb-file");
+    var message = modal.querySelector("#tftb-message");
+    var quoteWrap = modal.querySelector(".tftb-quote-wrap");
+    fileInput.value = defaultFile;
+    fileInput.placeholder = "e.g. Locations/Lumenhold.md or Lore/New Idea.md";
+
+    if (hasQuote) {
+      quoteWrap.hidden = false;
+      quoteWrap.querySelector(".quote").textContent = quote;
+      message.value = quote;
+      message.placeholder = "Edit the quoted markdown and/or add a short comment…";
     } else {
-      modal.querySelector("#tftb-subject").value = "Edit: " + (meta.title || meta.page);
+      quoteWrap.hidden = true;
+      message.value = "";
+      message.placeholder =
+        "Write markdown for the change, notes about this file, or a draft for a new note…";
     }
 
     backdrop.addEventListener("click", function (e) {
@@ -374,46 +384,41 @@ export default (() => {
     });
     modal.querySelector(".cancel").addEventListener("click", closeModal);
     modal.querySelector(".submit").addEventListener("click", function () {
-      submitSuggestion(mode, meta, quote, modal);
+      submitSuggestion(meta, quote, modal);
     });
     document.body.appendChild(backdrop);
-    var focusEl = modal.querySelector(mode === "quote" ? "#tftb-rewrite" : "#tftb-body");
-    if (focusEl) focusEl.focus();
+    message.focus();
+    if (hasQuote) {
+      try { message.setSelectionRange(message.value.length, message.value.length); } catch (e) {}
+    }
   }
 
-  async function submitSuggestion(mode, meta, quote, modal) {
+  async function submitSuggestion(meta, quote, modal) {
     var s = requireAuth();
     if (!s) return;
     var msg = modal.querySelector(".tftb-suggest-msg");
     msg.hidden = true;
 
-    var subject, body, quoteOut;
-    if (mode === "quote") {
-      var rewrite = (modal.querySelector("#tftb-rewrite").value || "").trim();
-      var comment = (modal.querySelector("#tftb-comment").value || "").trim();
-      if (!rewrite && !comment) {
-        msg.hidden = false;
-        msg.className = "tftb-suggest-msg err";
-        msg.textContent = "Add a rewrite or a comment.";
-        return;
-      }
-      subject = "Edit: " + (meta.title || meta.page);
-      quoteOut = quote;
-      body = [];
-      if (rewrite) body.push("**Proposed markdown:**\\n\\n```md\\n" + rewrite + "\\n```");
-      if (comment) body.push("**Comment:**\\n\\n" + comment);
-      body = body.join("\\n\\n");
-    } else {
-      subject = (modal.querySelector("#tftb-subject").value || "").trim();
-      body = (modal.querySelector("#tftb-body").value || "").trim();
-      quoteOut = "";
-      if (!subject || !body) {
-        msg.hidden = false;
-        msg.className = "tftb-suggest-msg err";
-        msg.textContent = "Subject and suggestion are required.";
-        return;
-      }
+    var file = (modal.querySelector("#tftb-file").value || "").trim().replace(/^\\/+/, "");
+    var message = (modal.querySelector("#tftb-message").value || "").trim();
+    if (!file) {
+      msg.hidden = false;
+      msg.className = "tftb-suggest-msg err";
+      msg.textContent = "Add a file path.";
+      return;
     }
+    if (!message) {
+      msg.hidden = false;
+      msg.className = "tftb-suggest-msg err";
+      msg.textContent = "Write a message (edit, comment, or new note draft).";
+      return;
+    }
+
+    var currentPath = meta.page === "index" ? "index" : meta.page;
+    var filePath = file.replace(/\\.md$/i, "");
+    var isOtherFile = filePath !== currentPath;
+    var subject = (isOtherFile ? "New/other: " : "Edit: ") + file;
+    var body = "**File:** \`" + file + "\`\\n\\n**Message:**\\n\\n\`\`\`md\\n" + message + "\\n\`\`\`";
 
     try {
       var res = await fetch(WORKER + "/api/suggest", {
@@ -425,10 +430,10 @@ export default (() => {
         body: JSON.stringify({
           subject: subject,
           body: body,
-          page: meta.page,
-          pageTitle: meta.title,
+          page: file.replace(/\\.md$/i, ""),
+          pageTitle: file,
           pageUrl: meta.url,
-          quote: quoteOut,
+          quote: quote || "",
         }),
       });
       var json = await res.json().catch(function () { return {}; });
