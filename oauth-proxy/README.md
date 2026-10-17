@@ -1,6 +1,6 @@
 # Wiki auth + suggest (character password)
 
-Thin gate for the published wiki and suggest-edit flow. Players sign in with **their name** + **character name** as the password (no GitHub).
+Thin gate for the published wiki and suggest-edit flow. Players sign in with **their name** + **previous character’s name** as the password (no GitHub).
 
 ## Flow
 

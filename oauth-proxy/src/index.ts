@@ -180,13 +180,13 @@ function loginHtml(returnUrl: string): string {
     "Sign in — Tales from the Bright",
     `
   <h1>Sign in</h1>
-  <p class="meta">Enter your name, and your character name as the password.</p>
+  <p class="meta">Enter your name and your previous character’s name.</p>
   <form id="f">
     <input type="hidden" name="returnUrl" value="${ret}" />
     <label for="player">Your name</label>
     <input id="player" name="player" required autocomplete="username" autofocus placeholder="e.g. Danny" />
-    <label for="password">Character name</label>
-    <input id="password" name="password" type="text" required autocomplete="off" placeholder="your character’s name" />
+    <label for="password">Your previous character’s name</label>
+    <input id="password" name="password" type="text" required autocomplete="off" placeholder="e.g. Sir Martin" />
     <button type="submit">Enter the wiki</button>
     <p id="msg" class="err" hidden></p>
   </form>
@@ -404,7 +404,7 @@ export default {
       }
       const name = verifyPlayer(env, data.player || "", data.password || "")
       if (!name) {
-        return Response.json({ error: "Wrong name or character name" }, { status: 401, headers })
+        return Response.json({ error: "Wrong name or previous character’s name" }, { status: 401, headers })
       }
       const { token, exp } = await signToken(env, name)
       return Response.json({ ok: true, token, name, exp }, { headers })
@@ -442,11 +442,12 @@ export default {
       const page = (data.page || "").trim()
       const pageTitle = (data.pageTitle || "").trim()
       const pageUrl = (data.pageUrl || "").trim()
-      const quote = (data.quote || "").trim()
+      // Prefer `original` (selection or loaded note); keep `quote` for older clients
+      const original = (data.original || data.quote || "").trim()
       if (!subject || !body) {
         return Response.json({ error: "Missing fields" }, { status: 400, headers })
       }
-      if (body.length > 20000 || subject.length > 200 || quote.length > 8000) {
+      if (body.length > 50000 || subject.length > 200 || original.length > 50000) {
         return Response.json({ error: "Too long" }, { status: 400, headers })
       }
       const issueBody = [
@@ -454,7 +455,7 @@ export default {
         pageTitle || page ? `**Page:** ${pageTitle || page}` : null,
         page ? `**Slug:** \`${page}\`` : null,
         pageUrl ? `**URL:** ${pageUrl}` : null,
-        quote ? `\n**Quoted markdown:**\n\n\`\`\`md\n${quote}\n\`\`\`\n` : null,
+        original ? `\n**Original:**\n\n\`\`\`md\n${original}\n\`\`\`\n` : null,
         body,
       ]
         .filter(Boolean)

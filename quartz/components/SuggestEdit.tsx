@@ -84,7 +84,7 @@ export default (() => {
     overflow: auto;
   }
   .tftb-suggest-modal {
-    width: min(40rem, 100%);
+    width: min(52rem, 100%);
     background: var(--light);
     color: var(--darkgray);
     border: 1px solid var(--lightgray);
@@ -92,28 +92,29 @@ export default (() => {
     padding: 1.1rem 1.2rem 1.25rem;
     box-shadow: 0 8px 28px rgba(0,0,0,0.18);
   }
-  .tftb-suggest-modal .EasyMDEContainer { margin-top: 0.15rem; }
-  .tftb-suggest-modal .EasyMDEContainer .CodeMirror {
+  .tftb-suggest-modal .tftb-md-editor {
+    margin-top: 0.15rem;
+    border: 1px solid var(--lightgray);
+    border-radius: 0.3rem;
+    overflow: hidden;
+  }
+  .tftb-suggest-modal .toastui-editor-defaultUI {
+    border: none;
+  }
+  .tftb-suggest-modal .toastui-editor-defaultUI-toolbar,
+  .tftb-suggest-modal .toastui-editor-mode-switch {
+    background: var(--light);
     border-color: var(--lightgray);
-    border-radius: 0 0 0.3rem 0.3rem;
+  }
+  .tftb-suggest-modal .toastui-editor-ww-container,
+  .tftb-suggest-modal .toastui-editor-contents {
     background: var(--light);
     color: var(--darkgray);
-    min-height: 200px;
+    font-size: 0.95rem;
   }
-  .tftb-suggest-modal .editor-toolbar {
-    border-color: var(--lightgray);
-    border-radius: 0.3rem 0.3rem 0 0;
-    background: var(--light);
-    opacity: 1;
-  }
-  .tftb-suggest-modal .editor-toolbar button { color: var(--darkgray) !important; }
-  .tftb-suggest-modal .editor-toolbar button:hover,
-  .tftb-suggest-modal .editor-toolbar button.active {
-    background: var(--lightgray) !important;
-    border-color: transparent !important;
-  }
-  .tftb-suggest-modal .editor-preview {
-    background: var(--light);
+  .tftb-suggest-modal .toastui-editor-contents h1,
+  .tftb-suggest-modal .toastui-editor-contents h2,
+  .tftb-suggest-modal .toastui-editor-contents h3 {
     color: var(--darkgray);
   }
   .tftb-suggest-modal h2 {
@@ -354,45 +355,45 @@ export default (() => {
   }
 
   var backdrop = null;
-  var easyMde = null;
-  var easyMdeLoading = null;
+  var mdEditor = null;
+  var toastLoading = null;
 
-  function ensureEasyMde() {
-    if (window.EasyMDE) return Promise.resolve();
-    if (easyMdeLoading) return easyMdeLoading;
-    easyMdeLoading = new Promise(function (resolve, reject) {
-      if (!document.querySelector("link[data-tftb-easymde]")) {
+  function ensureToastEditor() {
+    if (window.toastui && window.toastui.Editor) return Promise.resolve();
+    if (toastLoading) return toastLoading;
+    toastLoading = new Promise(function (resolve, reject) {
+      if (!document.querySelector("link[data-tftb-toast]")) {
         var link = document.createElement("link");
         link.rel = "stylesheet";
-        link.href = "https://cdn.jsdelivr.net/npm/easymde@2.18.0/dist/easymde.min.css";
-        link.setAttribute("data-tftb-easymde", "1");
+        link.href = "https://uicdn.toast.com/editor/3.2.2/toastui-editor.min.css";
+        link.setAttribute("data-tftb-toast", "1");
         document.head.appendChild(link);
       }
       var s = document.createElement("script");
-      s.src = "https://cdn.jsdelivr.net/npm/easymde@2.18.0/dist/easymde.min.js";
+      s.src = "https://uicdn.toast.com/editor/3.2.2/toastui-editor-all.min.js";
       s.async = true;
       s.onload = function () { resolve(); };
-      s.onerror = function () { easyMdeLoading = null; reject(new Error("easymde")); };
+      s.onerror = function () { toastLoading = null; reject(new Error("toastui")); };
       document.head.appendChild(s);
     });
-    return easyMdeLoading;
+    return toastLoading;
   }
 
-  function destroyEasyMde() {
-    if (!easyMde) return;
-    try { easyMde.toTextArea(); } catch (e) {}
-    easyMde = null;
+  function destroyMdEditor() {
+    if (!mdEditor) return;
+    try { mdEditor.destroy(); } catch (e) {}
+    mdEditor = null;
   }
 
   function closeModal() {
-    destroyEasyMde();
+    destroyMdEditor();
     if (backdrop) backdrop.remove();
     backdrop = null;
   }
 
   function readMessage(modal) {
-    if (easyMde) {
-      try { return (easyMde.value() || "").trim(); } catch (e) {}
+    if (mdEditor) {
+      try { return (mdEditor.getMarkdown() || "").trim(); } catch (e) {}
     }
     var el = modal.querySelector("#tftb-message");
     return ((el && el.value) || "").trim();
@@ -411,20 +412,20 @@ export default (() => {
       return {
         title: "Edit selection",
         meta: "This suggestion is for the current page. The editor starts with your highlight — change it or add a note.",
-        placeholder: "Edit the highlighted markdown…",
+        placeholder: "Edit the highlighted text…",
       };
     }
     if (mode === "new") {
       return {
         title: "Suggest a new note",
         meta: "Pick a file path for the new note, then write the draft (or a short description) below.",
-        placeholder: "Draft the new note in markdown…",
+        placeholder: "Draft the new note…",
       };
     }
     return {
       title: "Edit this page",
-      meta: "This suggestion is for the current page. Edit the full markdown, or replace it with your own message.",
-      placeholder: "Edit the page markdown, or write your own suggestion…",
+      meta: "This suggestion is for the current page. Edit the page, or replace it with your own message.",
+      placeholder: "Edit the page, or write your own suggestion…",
     };
   }
 
@@ -435,6 +436,8 @@ export default (() => {
     var meta = pageMeta();
     var mode = opts.mode || "page"; // quote | page | new
     var quote = (opts.quote || "").trim();
+    // Snapshot for the GitHub issue only (not shown in the UI)
+    var original = mode === "quote" ? quote : "";
     var copy = modeCopy(mode);
     var defaultFile = currentFilePath(meta);
 
@@ -447,7 +450,8 @@ export default (() => {
       '<label for="tftb-file">File</label>' +
       '<input id="tftb-file" type="text" spellcheck="false" />' +
       '<label for="tftb-message">Message</label>' +
-      '<textarea id="tftb-message" spellcheck="true"></textarea>' +
+      '<textarea id="tftb-message" spellcheck="true" hidden></textarea>' +
+      '<div id="tftb-md-editor" class="tftb-md-editor"></div>' +
       '<div class="tftb-suggest-actions">' +
       '<button type="button" class="cancel">Cancel</button>' +
       '<button type="button" class="primary submit">Send</button>' +
@@ -479,31 +483,33 @@ export default (() => {
     });
     modal.querySelector(".cancel").addEventListener("click", closeModal);
     modal.querySelector(".submit").addEventListener("click", function () {
-      submitSuggestion(mode, meta, quote, modal);
+      submitSuggestion(mode, meta, original, modal);
     });
     document.body.appendChild(backdrop);
 
     var bootEditor = function (initial) {
       message.value = initial || "";
-      ensureEasyMde().then(function () {
-        if (!backdrop || !document.body.contains(message)) return;
-        destroyEasyMde();
-        easyMde = new window.EasyMDE({
-          element: message,
-          initialValue: message.value || "",
-          placeholder: copy.placeholder,
-          spellChecker: false,
-          status: false,
+      var mount = modal.querySelector("#tftb-md-editor");
+      ensureToastEditor().then(function () {
+        if (!backdrop || !mount || !document.body.contains(mount)) return;
+        destroyMdEditor();
+        mount.innerHTML = "";
+        mdEditor = new window.toastui.Editor({
+          el: mount,
+          height: "320px",
+          initialEditType: "wysiwyg",
+          previewStyle: "vertical",
+          hideModeSwitch: false,
+          usageStatistics: false,
           autofocus: true,
-          minHeight: "200px",
-          renderingConfig: { singleLineBreaks: false },
-          toolbar: [
-            "bold", "italic", "heading", "|",
-            "quote", "unordered-list", "ordered-list", "|",
-            "link", "|", "preview", "side-by-side", "guide",
-          ],
+          placeholder: copy.placeholder,
+          initialValue: message.value || "",
         });
-      }).catch(function () { message.focus(); });
+      }).catch(function () {
+        message.hidden = false;
+        if (mount) mount.hidden = true;
+        message.focus();
+      });
     };
 
     if (mode === "page") {
@@ -512,9 +518,11 @@ export default (() => {
       msgEl.className = "tftb-suggest-msg";
       msgEl.textContent = "Loading page markdown…";
       fetchPageMarkdown(defaultFile).then(function (md) {
+        original = md || "";
         msgEl.hidden = true;
         bootEditor(md);
       }).catch(function () {
+        original = "";
         msgEl.hidden = false;
         msgEl.className = "tftb-suggest-msg err";
         msgEl.textContent = "Couldn’t load the file — you can still write a message.";
@@ -525,7 +533,7 @@ export default (() => {
     }
   }
 
-  async function submitSuggestion(mode, meta, quote, modal) {
+  async function submitSuggestion(mode, meta, original, modal) {
     var s = requireAuth();
     if (!s) return;
     var msg = modal.querySelector(".tftb-suggest-msg");
@@ -556,7 +564,7 @@ export default (() => {
       "**Mode:** " + kind + "\\n" +
       "**File:** \`" + file + "\`\\n" +
       (mode !== "new" ? "**Page URL:** " + meta.url + "\\n" : "") +
-      "\\n**Message:**\\n\\n\`\`\`md\\n" + message + "\\n\`\`\`";
+      "\\n**Suggested:**\\n\\n\`\`\`md\\n" + message + "\\n\`\`\`";
 
     try {
       var res = await fetch(WORKER + "/api/suggest", {
@@ -571,7 +579,7 @@ export default (() => {
           page: file.replace(/\\.md$/i, ""),
           pageTitle: file,
           pageUrl: mode === "new" ? "" : meta.url,
-          quote: mode === "quote" ? quote : "",
+          original: original || "",
         }),
       });
       var json = await res.json().catch(function () { return {}; });
