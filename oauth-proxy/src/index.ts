@@ -134,7 +134,8 @@ function verifyPlayer(env: Env, name: string, password: string): string | null {
   const key = name.trim().toLowerCase()
   const entry = Object.entries(map).find(([k]) => k.toLowerCase() === key)
   if (!entry) return null
-  if (!timingSafeEqual(entry[1], password)) return null
+  // Case-insensitive for both player name and character name
+  if (!timingSafeEqual(entry[1].trim().toLowerCase(), password.trim().toLowerCase())) return null
   return entry[0]
 }
 
