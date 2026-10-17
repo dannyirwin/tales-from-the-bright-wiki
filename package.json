@@ -21,9 +21,8 @@
     "install-plugins": "npx tsx ./quartz/plugins/loader/install-plugins.ts",
     "prebuild": "npm run install-plugins",
     "sync": "node scripts/sync-vault.mjs",
-    "copy-admin": "mkdir -p public/admin && cp -R admin/. public/admin/",
-    "build": "npx quartz build && npm run copy-admin",
-    "preview": "node scripts/sync-vault.mjs && node scripts/preview.mjs",
+    "build": "npx quartz build",
+    "preview": "node scripts/sync-vault.mjs && npx quartz build --serve",
     "bump": "node scripts/bump-site-meta.mjs",
     "publish": "node scripts/publish.mjs"
   },

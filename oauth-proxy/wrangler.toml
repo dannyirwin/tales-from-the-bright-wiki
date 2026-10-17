@@ -1,12 +1,11 @@
 #:schema node_modules/wrangler/config-schema.json
-# Scaffold for Decap GitHub OAuth on Cloudflare Workers.
-# Full steps: ../admin/README.md
-# Upstream reference: https://github.com/sterlingwes/decap-proxy
+# Password → GitHub issue suggest form (replaces Decap OAuth).
+# Keep folder name oauth-proxy so existing CF Root directory still works.
 
 compatibility_date = "2025-11-17"
 main = "src/index.ts"
-name = "tftb-decap-oauth"
+name = "tales-from-the-bright-wiki-decap"
 
-# Repo is public → public_repo scope is enough.
 [vars]
-GITHUB_REPO_PRIVATE = "0"
+GITHUB_REPO = "dannyirwin/tales-from-the-bright-wiki"
+WIKI_ORIGIN = "https://dannyirwin.github.io"
